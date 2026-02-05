@@ -1,14 +1,8 @@
-import express, { Request, Response } from 'express'
-import dotenv from 'dotenv'
+import app from './app'
+import config from './config/env'
 
-dotenv.config()
+const PORT = config.port || 8000
 
-const app = express()
-const PORT = process.env.PORT || 8000
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('Server is running')
-})
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`)
