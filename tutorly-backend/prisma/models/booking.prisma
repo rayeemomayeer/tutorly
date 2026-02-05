@@ -1,0 +1,12 @@
+model Booking {
+  id          String        @id @default(uuid())
+  studentId   String
+  tutorId     String
+  status      BookingStatus @default(CONFIRMED)
+  scheduledAt DateTime
+  createdAt   DateTime      @default(now())
+
+  student     User         @relation("StudentBookings", fields: [studentId], references: [id])
+  tutor       TutorProfile @relation("TutorBookings", fields: [tutorId], references: [id])
+  review      Review?
+}

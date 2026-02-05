@@ -1,0 +1,13 @@
+model TutorProfile {
+  id          String      @id @default(uuid())
+  userId      String      @unique
+  bio         String?
+  hourlyRate  Float
+  rating      Float       @default(0)
+
+  user        User        @relation(fields: [userId], references: [id])
+  subjects    Category[]  @relation("TutorCategories")
+  availability AvailabilitySlot[]
+  bookings    Booking[]   @relation("TutorBookings")
+  reviews     Review[]    @relation("TutorReviews")
+}
