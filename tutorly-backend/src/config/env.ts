@@ -10,7 +10,7 @@ const requiredEnvVars = [
     'FRONTEND_URL',
     'EMAIL_USER',
     'EMAIL_PASS',
-    
+    'AUTH_SECRET'
 ];
 
 requiredEnvVars.forEach((envVar) => {
@@ -26,6 +26,7 @@ export const config = {
     FRONTEND_URL: process.env.FRONTEND_URL,
     EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_PASS: process.env.EMAIL_PASS,
+    AUTH_SECRET: process.env.AUTH_SECRET
 };
 
 export default config;

@@ -4,8 +4,7 @@ import morgan from 'morgan';
 import { errorResponse } from './utils/response';
 import { toNodeHandler } from "better-auth/node";
 import { auth } from './config/auth';
-
-
+import categoryRoutes from "./modules/categories/category.routes";
 
 const app = express();
 
@@ -20,6 +19,8 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
+
+app.use("/api/categories", categoryRoutes);
 
 // Global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

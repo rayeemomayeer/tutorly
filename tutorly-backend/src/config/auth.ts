@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prisma } from "./db";
 import config from "./env";
 import nodemailer from "nodemailer"
+import { prismaAdapter } from "better-auth/adapters/prisma";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -20,8 +21,13 @@ interface VerificationUser {
 
 export const auth = betterAuth({
 
-  database: prisma,
+  adapter: prismaAdapter(prisma, {
+    provider: "postgresql",   
+    usePlural: false,        
+  }),
 
+  secret: config.AUTH_SECRET!,
+  baseURL: config.APP_URL,
   auth: {
     emailPassword: true,
     emailVerification: {
