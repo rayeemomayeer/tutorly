@@ -1,16 +1,22 @@
 import { prisma } from "../config/db";
+import bcrypt from "bcrypt";
 
 async function main() {
   console.log("Seeding database...");
 
+  const adminHashedPassword = await bcrypt.hash("admin123", 10);
+  const tutorHashedPassword = await bcrypt.hash("tutor123", 10);
+  const studentHashedPassword = await bcrypt.hash("student123", 10);
+
   // Admin
-  const admin = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: "admin@skillbridge.com" },
     update: {},
     create: {
       email: "admin@skillbridge.com",
       name: "Super Admin",
       role: "ADMIN",
+      password: adminHashedPassword,
     },
   });
 
@@ -32,6 +38,7 @@ async function main() {
       email: "tutor@skillbridge.com",
       name: "Alex Tutor",
       role: "TUTOR",
+      password: tutorHashedPassword,
     },
   });
 
@@ -67,6 +74,7 @@ async function main() {
       email: "student@skillbridge.com",
       name: "Emily Student",
       role: "STUDENT",
+      password: studentHashedPassword,
     },
   });
 

@@ -5,35 +5,14 @@ CREATE TYPE "Role" AS ENUM ('STUDENT', 'TUTOR', 'ADMIN');
 CREATE TYPE "BookingStatus" AS ENUM ('CONFIRMED', 'COMPLETED', 'CANCELLED');
 
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE "AvailabilitySlot" (
     "id" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "role" "Role" NOT NULL DEFAULT 'STUDENT',
-    "isBanned" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "tutorId" TEXT NOT NULL,
+    "dayOfWeek" INTEGER NOT NULL,
+    "startTime" TIMESTAMP(3) NOT NULL,
+    "endTime" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "TutorProfile" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "bio" TEXT,
-    "hourlyRate" DOUBLE PRECISION NOT NULL,
-    "rating" DOUBLE PRECISION NOT NULL DEFAULT 0,
-
-    CONSTRAINT "TutorProfile_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Category" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-
-    CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "AvailabilitySlot_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -46,6 +25,14 @@ CREATE TABLE "Booking" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Booking_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Category" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -62,14 +49,31 @@ CREATE TABLE "Review" (
 );
 
 -- CreateTable
-CREATE TABLE "AvailabilitySlot" (
+CREATE TABLE "TutorProfile" (
     "id" TEXT NOT NULL,
-    "tutorId" TEXT NOT NULL,
-    "dayOfWeek" INTEGER NOT NULL,
-    "startTime" TIMESTAMP(3) NOT NULL,
-    "endTime" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT NOT NULL,
+    "bio" TEXT,
+    "hourlyRate" DOUBLE PRECISION NOT NULL,
+    "rating" DOUBLE PRECISION NOT NULL DEFAULT 0,
 
-    CONSTRAINT "AvailabilitySlot_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "TutorProfile_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "name" TEXT,
+    "role" TEXT NOT NULL DEFAULT 'STUDENT',
+    "phone" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "emailVerified" BOOLEAN NOT NULL DEFAULT false,
+    "image" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -81,22 +85,22 @@ CREATE TABLE "_TutorCategories" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "TutorProfile_userId_key" ON "TutorProfile"("userId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Category_name_key" ON "Category"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Review_bookingId_key" ON "Review"("bookingId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "TutorProfile_userId_key" ON "TutorProfile"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
 CREATE INDEX "_TutorCategories_B_index" ON "_TutorCategories"("B");
 
 -- AddForeignKey
-ALTER TABLE "TutorProfile" ADD CONSTRAINT "TutorProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AvailabilitySlot" ADD CONSTRAINT "AvailabilitySlot_tutorId_fkey" FOREIGN KEY ("tutorId") REFERENCES "TutorProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Booking" ADD CONSTRAINT "Booking_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -114,7 +118,7 @@ ALTER TABLE "Review" ADD CONSTRAINT "Review_tutorId_fkey" FOREIGN KEY ("tutorId"
 ALTER TABLE "Review" ADD CONSTRAINT "Review_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "Booking"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AvailabilitySlot" ADD CONSTRAINT "AvailabilitySlot_tutorId_fkey" FOREIGN KEY ("tutorId") REFERENCES "TutorProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TutorProfile" ADD CONSTRAINT "TutorProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_TutorCategories" ADD CONSTRAINT "_TutorCategories_A_fkey" FOREIGN KEY ("A") REFERENCES "Category"("id") ON DELETE CASCADE ON UPDATE CASCADE;
