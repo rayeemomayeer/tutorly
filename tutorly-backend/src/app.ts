@@ -2,8 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { errorResponse } from './utils/response';
-import { prisma } from './config/db';
-import { requireAuth, requireRole } from './middleware/authMiddleware';
+import { toNodeHandler } from "better-auth/node";
+import { auth } from './config/auth';
 
 
 
@@ -19,8 +19,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Tutorly Backend is running')
 })
 
-
-
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
 // Global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
