@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { errorResponse } from './utils/response';
+import { prisma } from './config/db';
 
 
 
@@ -16,6 +17,12 @@ app.use(morgan('dev'));
 app.get('/', (req: Request, res: Response) => {
   res.send('Tutorly Backend is running')
 })
+
+app.get("/api/users", async (req, res) => {
+  const users = await prisma.user.findMany();
+  res.json(users);
+});
+
 
 // Global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
