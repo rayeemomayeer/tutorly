@@ -5,6 +5,7 @@ import { errorResponse } from './utils/response';
 import { toNodeHandler } from "better-auth/node";
 import categoryRoutes from "./modules/categories/category.routes";
 import config from './config/env';
+import { auth } from './lib/auth';
 
 const app = express()
 
@@ -13,8 +14,11 @@ app.use(cors({
     credentials: true
 }))
 
+app.all("/api/auth/*splat", toNodeHandler(auth)); 
+
 app.use(express.json());
 app.use(morgan('dev'));
+
 
 
 app.get('/', (req: Request, res: Response) => {
