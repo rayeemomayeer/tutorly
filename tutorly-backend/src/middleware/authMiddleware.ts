@@ -1,4 +1,4 @@
-import { auth } from "../config/auth";
+import { auth } from "../lib/auth";
 import { Request, Response, NextFunction } from "express";
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {

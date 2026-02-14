@@ -7,10 +7,10 @@ const requiredEnvVars = [
     'PORT',
     'DATABASE_URL',
     'APP_URL',
-    'FRONTEND_URL',
     'EMAIL_USER',
     'EMAIL_PASS',
-    'AUTH_SECRET'
+    'BETTER_AUTH_SECRET',
+    'BETTER_AUTH_URL'
 ];
 
 requiredEnvVars.forEach((envVar) => {
@@ -23,10 +23,10 @@ export const config = {
     port: process.env.PORT || 5000,
     databaseUrl: process.env.DATABASE_URL,
     APP_URL: process.env.APP_URL,
-    FRONTEND_URL: process.env.FRONTEND_URL,
     EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_PASS: process.env.EMAIL_PASS,
-    AUTH_SECRET: process.env.AUTH_SECRET
+    AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+    AUTH_URL: process.env.BETTER_AUTH_URL,
 };
 
 export default config;
