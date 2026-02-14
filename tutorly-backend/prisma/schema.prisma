@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -22,13 +23,18 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  // SkillBridge relations
+
   tutorProfile TutorProfile?
 
-  // Opposite sides of relations
+
   studentBookings Booking[] @relation("StudentBookings")
   tutorBookings   Booking[] @relation("TutorBookings")
   studentReviews  Review[]  @relation("StudentReviews")
+
+  role       String?
+  banned     Boolean?  @default(false)
+  banReason  String?
+  banExpires DateTime?
 
   @@unique([email])
   @@map("user")
@@ -44,6 +50,8 @@ model Session {
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  impersonatedBy String?
 
   @@unique([token])
   @@index([userId])
