@@ -7,6 +7,10 @@ datasource db {
   provider = "postgresql"
 }
 
+// -----------------------------
+// Better Auth generated models
+// -----------------------------
+
 model User {
   id            String    @id
   name          String
@@ -17,6 +21,14 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+
+  // SkillBridge relations
+  tutorProfile TutorProfile?
+
+  // Opposite sides of relations
+  studentBookings Booking[] @relation("StudentBookings")
+  tutorBookings   Booking[] @relation("TutorBookings")
+  studentReviews  Review[]  @relation("StudentReviews")
 
   @@unique([email])
   @@map("user")
@@ -68,4 +80,65 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+// -----------------------------
+// SkillBridge domain models
+// -----------------------------
+
+model TutorProfile {
+  id           String         @id @default(uuid())
+  userId       String         @unique
+  bio          String?
+  hourlyRate   Float
+  subjects     Category[]
+  availability Availability[]
+  reviews      Review[]
+  user         User           @relation(fields: [userId], references: [id])
+}
+
+model Category {
+  id     String         @id @default(uuid())
+  name   String         @unique
+  tutors TutorProfile[]
+}
+
+model Booking {
+  id          String        @id @default(uuid())
+  studentId   String
+  tutorId     String
+  status      BookingStatus @default(CONFIRMED)
+  scheduledAt DateTime
+  createdAt   DateTime      @default(now())
+
+  student User @relation("StudentBookings", fields: [studentId], references: [id])
+  tutor   User @relation("TutorBookings", fields: [tutorId], references: [id])
+}
+
+enum BookingStatus {
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  studentId String
+  tutorId   String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  student User         @relation("StudentReviews", fields: [studentId], references: [id])
+  tutor   TutorProfile @relation(fields: [tutorId], references: [id])
+}
+
+model Availability {
+  id        String   @id @default(uuid())
+  tutorId   String
+  dayOfWeek Int
+  startTime DateTime
+  endTime   DateTime
+
+  tutor TutorProfile @relation(fields: [tutorId], references: [id])
 }
