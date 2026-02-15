@@ -15,6 +15,8 @@ const authMiddleware = (resource: keyof typeof ac.statements, action: string) =>
         )
       });
 
+      req.session = session;
+
       if (!session) return res.status(401).send("Unauthorized");
       const hasPermission = await betterAuth.api.userHasPermission({
         body: {
