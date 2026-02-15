@@ -15,19 +15,23 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
 
-  emailAndPassword: { 
-    enabled: true, 
-  }, 
+  emailAndPassword: {
+    enabled: true,
+  },
 
   plugins: [
     adminPlugin({
-            ac,
-            roles: {
-                adminRole,
-                studentRole,
-                tutorRole
-            }
-        }),
+      ac,
+      adminRoles: ["admin"],
+      defaultRole: "student",
+      roles: {
+        admin: adminRole,
+        student: studentRole,
+        tutor: tutorRole,
+
+      },
+
+    }),
 
   ]
 

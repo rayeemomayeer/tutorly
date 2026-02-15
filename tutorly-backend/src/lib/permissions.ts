@@ -2,36 +2,39 @@ import { createAccessControl } from "better-auth/plugins";
 
 
 const statement = {
-  user: ["create", "read", "update", "delete"],
+  auth: ["sign-up", "sign-in", "logout"],
+  user: ["read", "update", "list", "ban", "unban", "promote", "demote"],
   tutor: ["create", "read", "update", "delete"],
-  booking: ["create", "read", "update", "delete", "cancel", "complete"],
-  review: ["create", "read", "update", "delete"],
+  booking: ["create", "read", "cancel", "complete", "list", "delete"],
+  review: ["create", "read", "delete"],
   category: ["create", "read", "update", "delete"],
 } as const;
 
-
 export const ac = createAccessControl(statement);
 
-// Roles
 export const studentRole = ac.newRole({
-  tutor: ["read"], 
-  booking: ["create", "read", "cancel"], 
-  review: ["create", "read"], 
+  auth: ["sign-up", "sign-in", "logout"],
   user: ["read", "update"],
+  tutor: ["read"],
+  booking: ["create", "read", "cancel"],
+  review: ["create", "read"],
+  category: ["read"],
 });
 
 export const tutorRole = ac.newRole({
-  tutor: ["create", "read", "update"], 
-  booking: ["read", "complete"], 
-  review: ["read"], 
+  auth: ["sign-up", "sign-in", "logout"],
   user: ["read", "update"],
-  category: ["read"], 
+  tutor: ["create", "read", "update"],
+  booking: ["read", "cancel","complete"],
+  review: ["read"],
+  category: ["read"],
 });
 
 export const adminRole = ac.newRole({
-  user: ["create", "read", "update", "delete"], 
-  tutor: ["create", "read", "update", "delete"], 
-  booking: ["create", "read", "update", "delete", "cancel", "complete"], 
-  review: ["read", "delete"], 
-  category: ["create", "read", "update", "delete"], 
+  auth: ["sign-up", "sign-in", "logout"],
+  user: ["read", "update", "list", "ban", "unban", "promote", "demote"],
+  tutor: ["create", "read", "update", "delete"],
+  booking: ["create", "read", "cancel", "complete", "list", "delete"],
+  review: ["read", "delete"],
+  category: ["create", "read", "update", "delete"],
 });
