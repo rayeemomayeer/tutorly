@@ -19,9 +19,17 @@ const updateCategory = async (req: Request, res: Response) => {
     res.json(category);
 }
 
+const deleteCategory = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  await CategoryService.deleteCategory(id as string);
+  res.status(204).send();
+};
+
+
 
 export const CategoryController = {
     getAllCategories,
     createCategory,
-    updateCategory
+    updateCategory,
+    deleteCategory
 }

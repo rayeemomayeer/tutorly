@@ -5,15 +5,43 @@ const getAllCategories = async () => {
 }
 
 const createCategory = async (name: string) => {
-    return prisma.category.create({ data: { name } });
+
+    try {
+        return await prisma.category.create({
+            data: { name: name.trim().toLowerCase() },
+        });
+    } catch (error: any) {
+        if (error.code === "P2002") {
+            throw new Error("Category already exists");
+        }
+        throw error;
+    }
 }
 
 const updateCategory = async (id: string, name: string) => {
-    return prisma.category.update({ where: { id }, data: { name } });
+
+    try {
+        return await prisma.category.update({
+            where: { id },
+            data: { name: name.trim().toLowerCase() },
+        });
+    } catch (error: any) {
+        if (error.code === "P2002") {
+            throw new Error("Category already exists");
+        }
+        throw error;
+    }
 }
+
+const deleteCategory = async (id: string) => {
+    return prisma.category.delete({ where: { id } });
+};
+
+
 
 export const CategoryService = {
     getAllCategories,
     createCategory,
-    updateCategory
+    updateCategory,
+    deleteCategory
 }
