@@ -2,7 +2,7 @@ import { Router } from "express";
 import { CategoryController } from "./category.controller";
 import authMiddleware from "src/middleware/authMiddleware";
 import { validate } from "src/middleware/validate";
-import { createCategorySchema, updateCategorySchema } from "src/validations/category.validation";
+import { createCategorySchema, updateCategorySchema } from "src/modules/categories/category.validation";
 
 const categoryRouter = Router();
 
