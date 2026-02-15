@@ -1,21 +1,36 @@
-import { auth } from "../lib/auth";
 import { Request, Response, NextFunction } from "express";
+import { auth as betterAuth } from "../lib/auth";
+import { ac } from "src/lib/permissions";
 
-export async function requireAuth(req: Request, res: Response, next: NextFunction) {
+const authMiddleware = (resource: keyof typeof ac.statements, action: string) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
 
-  const session = (req as any).auth?.session;
-  if (!session?.user) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-  req.user = session.user as { id: string; email: string; role: string };
-  next();
-}
+    try {
+      const session = await betterAuth.api.getSession({
+        headers: new Headers(
+          Object.entries(req.headers).map(([key, value]) => [
+            key,
+            Array.isArray(value) ? value.join(",") : value ?? ""
+          ])
+        )
+      });
 
-export function requireRole(role: "ADMIN" | "TUTOR" | "STUDENT") {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user || req.user.role !== role) {
-      return res.status(403).json({ error: "Forbidden" });
+      if (!session) return res.status(401).send("Unauthorized");
+      const hasPermission = await betterAuth.api.userHasPermission({
+        body: {
+          userId: session.user.id,
+          role: session.user.role || "user" as any,
+          permission: { [resource]: [action] }
+        }
+      })
+
+      if (!hasPermission || !hasPermission.success) return res.status(403).send("Forbidden");
+
+      next();
+    } catch (error) {
+      console.error(error);
     }
-    next();
   };
-}
+};
+
+export default authMiddleware;

@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { CategoryController } from "./category.controller";
-import { requireRole } from "src/middleware/authMiddleware";
+import authMiddleware from "src/middleware/authMiddleware";
 
-const router = Router();
+const categoryRouter = Router();
 
-router.get("/", CategoryController.getAllCategories);
-router.post("/", requireRole("ADMIN"), CategoryController.createCategory);
-router.put("/:id", requireRole("ADMIN"), CategoryController.updateCategory);
+categoryRouter.get("/",authMiddleware("category", "read"), CategoryController.getAllCategories);
 
-export default router;
+categoryRouter.post("/", authMiddleware("category", "create"), CategoryController.createCategory);
+
+categoryRouter.put("/:id", authMiddleware("category", "update"), CategoryController.updateCategory);
+
+export default categoryRouter;

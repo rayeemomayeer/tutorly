@@ -26,9 +26,7 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 
-
-app.use("/api/categories", categoryRoutes);
-
+app.use("/api/category", categoryRoutes);
 
 
 
