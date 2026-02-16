@@ -18,6 +18,15 @@ const authMiddleware = (resource: keyof typeof ac.statements, action: string) =>
       req.session = session;
 
       if (!session) return res.status(401).send("Unauthorized");
+     
+      if (session.user.banned) {
+        return res.status(403).json({
+          code: "BANNED_USER",
+          message: "Your account has been banned. Contact support.",
+        });
+      }
+
+
       const hasPermission = await betterAuth.api.userHasPermission({
         body: {
           userId: session.user.id,
