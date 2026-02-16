@@ -1,10 +1,24 @@
 import { Request, Response } from "express";
 import { TutorService } from "./tutor.service";
+import { TutorFilters } from "./tutor.types";
+
 
 const getAllTutors = async (req: Request, res: Response) => {
-  const tutors = await TutorService.getAllTutors();
-  res.json(tutors);
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+
+  const filters: TutorFilters = {
+    categoryId: req.query.categoryId as string | undefined,
+    minRate: req.query.minRate ? parseInt(req.query.minRate as string) : undefined,
+    maxRate: req.query.maxRate ? parseInt(req.query.maxRate as string) : undefined,
+    search: req.query.search as string | undefined,
+  };
+
+  const result = await TutorService.getAllTutors(page, limit, filters);
+  res.json(result);
 };
+
+
 
 const getTutorById = async (req: Request, res: Response) => {
   const { id } = req.params;
