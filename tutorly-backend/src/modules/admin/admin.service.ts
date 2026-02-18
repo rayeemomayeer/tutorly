@@ -1,7 +1,9 @@
 import { prisma } from "../../lib/prisma";
 
-const listUsers = async () => {
+const listUsers = async (page: number, limit: number) => {
   return prisma.user.findMany({
+    skip: (page -1)*limit,
+    take: limit,
     select: {
       id: true,
       email: true,
@@ -9,6 +11,7 @@ const listUsers = async () => {
       banned: true, 
       createdAt: true,
     },
+    orderBy: { createdAt: "desc" },
   });
 };
 

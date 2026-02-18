@@ -1,10 +1,25 @@
 import { Request, Response } from "express";
 import { AdminService } from "./admin.service";
+import { prisma } from "src/lib/prisma";
 
-const listUsers = async (req: Request, res: Response) => {
-  const users = await AdminService.listUsers();
-  res.json(users);
+export const listUsers = async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 5;
+
+  const users = await AdminService.listUsers(page, limit);
+  const total = await prisma.user.count();
+
+  res.json({
+    data: users,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  });
 };
+
 
 const banUser = async (req: Request, res: Response) => {
   const { id } = req.params;
