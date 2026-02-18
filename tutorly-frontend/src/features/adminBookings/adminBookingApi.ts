@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const adminBookingApi = createApi({
   reducerPath: "adminBookingApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "/api", credentials: "include" }),
+  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}`, credentials: "include" }),
   tagTypes: ["AdminBooking"],
   endpoints: (builder) => ({
     getAllBookings: builder.query<any[], void>({

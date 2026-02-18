@@ -19,7 +19,7 @@ export default function UserList() {
             <p>Role: {user.role}</p>
             <p>Status: {user.isBanned ? "Banned" : "Active"}</p>
           </div>
-          <UserActions id={user.id} isBanned={user.isBanned} />
+          <UserActions id={user.id} currentRole={user.role} isBanned={user.isBanned} />
         </div>
       ))}
     </div>

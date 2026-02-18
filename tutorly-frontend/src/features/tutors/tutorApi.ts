@@ -11,7 +11,7 @@ export type TutorFilters = {
 
 export const tutorApi = createApi({
   reducerPath: "tutorApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "/api" }), // Adjust the base URL as needed
+  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }), 
   tagTypes: ["Tutor"],
   endpoints: (builder) => ({
     getTutors: builder.query<any, TutorFilters>({
