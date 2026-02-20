@@ -10,6 +10,7 @@ import { adminApi } from "@/features/admin/adminApi";
 import { tutorBookingApi } from "@/features/tutorBookings/tutorBookingApi";
 import { adminBookingApi } from "@/features/adminBookings/adminBookingApi";
 import { adminCategoryApi } from "@/features/adminCategories/adminCategoryApi";
+import { adminDashboardApi } from "@/features/adminDashboard/adminDashboardApi";
 
 export const store = configureStore({
   reducer: {
@@ -23,6 +24,8 @@ export const store = configureStore({
     [tutorBookingApi.reducerPath]: tutorBookingApi.reducer,
     [adminBookingApi.reducerPath]: adminBookingApi.reducer,
     [adminCategoryApi.reducerPath]: adminCategoryApi.reducer,
+    [adminDashboardApi.reducerPath]: adminDashboardApi.reducer,
+    
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -34,7 +37,8 @@ export const store = configureStore({
       adminApi.middleware,
       tutorBookingApi.middleware,
       adminBookingApi.middleware,
-      adminCategoryApi.middleware
+      adminCategoryApi.middleware,
+      adminDashboardApi.middleware
     ),
 });
 

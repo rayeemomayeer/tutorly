@@ -46,10 +46,24 @@ const demoteUser = async (req: Request, res: Response) => {
   res.json(user);
 };
 
+
+const getStats = async (req: Request, res: Response) => {
+  const totalUsers = await prisma.user.count();
+  const totalTutors = await prisma.user.count({ where: { role: "tutor" } });
+  const totalBookings = await prisma.booking.count();
+  const totalCategories = await prisma.category.count();
+
+  console.log("Stats:", { totalUsers, totalTutors, totalBookings, totalCategories });
+
+  res.json({ totalUsers, totalTutors, totalBookings, totalCategories });
+};
+
+
 export const AdminController = {
   listUsers,
   banUser,
   unbanUser,
   promoteUser,
   demoteUser,
+  getStats
 };

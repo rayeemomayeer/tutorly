@@ -7,19 +7,19 @@ export const adminBookingApi = createApi({
   tagTypes: ["AdminBooking"],
   endpoints: (builder) => ({
     getAllBookings: builder.query<any[], void>({
-      query: () => "/bookings/admin/all",
+      query: () => "/booking/admin/all",
       providesTags: ["AdminBooking"],
     }),
     cancelBooking: builder.mutation({
       query: (id: string) => ({
-        url: `/bookings/${id}/cancel`,
+        url: `/booking/${id}/cancel`,
         method: "PATCH",
       }),
       invalidatesTags: ["AdminBooking"],
     }),
     completeBooking: builder.mutation({
       query: (id: string) => ({
-        url: `/bookings/${id}/complete`,
+        url: `/booking/${id}/complete`,
         method: "PATCH",
       }),
       invalidatesTags: ["AdminBooking"],

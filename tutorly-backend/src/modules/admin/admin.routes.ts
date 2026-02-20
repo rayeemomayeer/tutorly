@@ -19,4 +19,7 @@ adminRouter.patch("/users/:id/promote", authMiddleware("user", "promote"), Admin
 
 adminRouter.patch("/users/:id/demote", authMiddleware("user", "demote"), AdminController.demoteUser);
 
+
+adminRouter.get("/stats", authMiddleware("user", "list"), AdminController.getStats);
+
 export default adminRouter;

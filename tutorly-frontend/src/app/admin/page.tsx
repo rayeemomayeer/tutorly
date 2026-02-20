@@ -1,3 +1,4 @@
+import AdminStats from "@/features/adminDashboard/AdminStats";
 import Link from "next/link";
 
 export default function AdminDashboardPage() {
@@ -5,6 +6,8 @@ export default function AdminDashboardPage() {
   return (
     <div className="p-6 space-y-6">
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+
+        <AdminStats />
 
         <Link href="/admin/users" className="block p-4 bg-blue-500 text-white rounded hover:bg-blue-600">
             Manage Users
