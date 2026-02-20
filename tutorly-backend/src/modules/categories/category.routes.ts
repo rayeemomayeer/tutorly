@@ -10,7 +10,7 @@ categoryRouter.get("/", authMiddleware("category", "read"), CategoryController.g
 
 categoryRouter.post("/", authMiddleware("category", "create"), validate(createCategorySchema), CategoryController.createCategory);
 
-categoryRouter.put("/:id", authMiddleware("category", "update"), validate(updateCategorySchema), CategoryController.updateCategory);
+categoryRouter.patch("/:id", authMiddleware("category", "update"), validate(updateCategorySchema), CategoryController.updateCategory);
 
 categoryRouter.delete(
     "/:id",
