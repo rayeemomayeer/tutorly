@@ -31,9 +31,9 @@ app.get('/', (req: Request, res: Response) => {
 
 
 app.use("/api/category", categoryRoutes);
-app.use("/api/tutor", tutorRouters);
-app.use("/api/booking", bookingRoutes);
-app.use("/api/review", reviewRouters);
+app.use("/api/tutors", tutorRouters);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/reviews", reviewRouters);
 app.use("/api/admin", adminRouters)
 
 

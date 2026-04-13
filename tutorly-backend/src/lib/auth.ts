@@ -7,7 +7,7 @@ import { admin as adminPlugin } from "better-auth/plugins"
 export const auth = betterAuth({
   appName: "Tutorly",
 
-  baseUrl: process.env.APP_URL || "http://localhost:4000",
+  baseUrl: process.env.BETTER_AUTH_URL || "http://localhost:4000",
 
   trustedOrigins: [process.env.APP_URL || "http://localhost:3000"],
 

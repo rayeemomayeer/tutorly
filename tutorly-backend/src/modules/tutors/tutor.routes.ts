@@ -10,8 +10,9 @@ const tutorRouter = Router();
 
 
 tutorRouter.get("/", authMiddleware("tutor", "read"), TutorController.getAllTutors);
-tutorRouter.get("/:id", authMiddleware("tutor", "read"), TutorController.getTutorById);
 
+tutorRouter.get("/:id", authMiddleware("tutor", "read"),  TutorController.getTutorById);
+// tutorRouter.get("/:id",  TutorController.getTutorById);
 
 tutorRouter.post(
   "/profile",

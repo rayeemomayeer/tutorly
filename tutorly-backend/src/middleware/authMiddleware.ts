@@ -30,10 +30,12 @@ const authMiddleware = (resource: keyof typeof ac.statements, action: string) =>
       const hasPermission = await betterAuth.api.userHasPermission({
         body: {
           userId: session.user.id,
-          role: session.user.role || "user" as any,
+          role: session.user.role || "student" as any,
           permission: { [resource]: [action] }
         }
       })
+
+
 
       if (!hasPermission || !hasPermission.success) return res.status(403).send("Forbidden");
 

@@ -14,8 +14,8 @@ export const authApi = createApi({
     logout: builder.mutation<void, void>({
       query: () => ({ url: "/logout", method: "POST" }),
     }),
-    me: builder.query<any, void>({
-      query: () => "/me",
+    getSession: builder.query<any, void>({
+      query: () => "/get-session",
     }),
   }),
 });
@@ -24,5 +24,5 @@ export const {
   useRegisterMutation,
   useLoginMutation,
   useLogoutMutation,
-  useMeQuery,
+  useGetSessionQuery,
 } = authApi;
