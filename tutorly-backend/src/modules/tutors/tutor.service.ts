@@ -77,22 +77,23 @@ const updateTutorProfile = async (
   id: string,
   bio: string,
   hourlyRate: number,
-  subjects: string[]
+  categories: { id: string }[]
 ) => {
+  const categoryIds = categories.map((c) => c.id);
+
   return prisma.tutorProfile.update({
     where: { id },
     data: {
       bio,
       hourlyRate,
       subjects: {
-        set: [],
-        connect: subjects.map((name) => ({ name })),
+        set: [], 
+        connect: categoryIds.map((id) => ({ id })), 
       },
     },
     include: { subjects: true, user: true },
   });
 };
-
 const deleteTutorProfile = async (id: string) => {
   return prisma.tutorProfile.delete({ where: { id } });
 };

@@ -41,10 +41,10 @@ export const tutorApi = createApi({
       invalidatesTags: ["Tutor"],
     }),
     updateTutorProfile: builder.mutation({
-      query: ({ id, ...body }) => ({
+      query: ({ id, bio, hourlyRate, categories }) => ({
         url: `/tutors/profile/${id}`,
         method: "PUT",
-        body,
+        body: {bio, hourlyRate, categories},
       }),
       invalidatesTags: ["Tutor"],
     }),

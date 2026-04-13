@@ -35,11 +35,17 @@ const createTutorProfile = async (req: Request, res: Response) => {
 
 const updateTutorProfile = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { bio, hourlyRate, subjects } = req.body;
-  const profile = await TutorService.updateTutorProfile(id as string, bio, hourlyRate, subjects);
+  const { bio, hourlyRate, categories } = req.body; 
+
+  const profile = await TutorService.updateTutorProfile(
+    id as string,
+    bio,
+    hourlyRate,
+    categories
+  );
+
   res.json(profile);
 };
-
 const deleteTutorProfile = async (req: Request, res: Response) => {
   const { id } = req.params;
   await TutorService.deleteTutorProfile(id as string);
