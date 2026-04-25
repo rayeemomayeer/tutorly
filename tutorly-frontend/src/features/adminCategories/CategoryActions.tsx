@@ -1,4 +1,4 @@
-// src/features/adminCategories/CategoryActions.tsx
+
 "use client";
 import { useState } from "react";
 import { useUpdateCategoryMutation, useDeleteCategoryMutation } from "./adminCategoryApi";

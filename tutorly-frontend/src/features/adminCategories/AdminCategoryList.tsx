@@ -1,4 +1,4 @@
-// src/features/adminCategories/AdminCategoryList.tsx
+
 "use client";
 import { useGetCategoriesQuery } from "./adminCategoryApi";
 import CategoryActions from "./CategoryActions";

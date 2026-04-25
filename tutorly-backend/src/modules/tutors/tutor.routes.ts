@@ -11,7 +11,19 @@ const tutorRouter = Router();
 
 tutorRouter.get("/", authMiddleware("tutor", "read"), TutorController.getAllTutors);
 
-tutorRouter.get("/:id", authMiddleware("tutor", "read"),  TutorController.getTutorById);
+tutorRouter.get("/:id", authMiddleware("tutor", "read"), TutorController.getTutorById);
+
+tutorRouter.get(
+  "/:id/availability",
+  authMiddleware("availability", "read"),
+  TutorController.getAvailability
+);
+
+tutorRouter.post(
+  "/:id/availability",
+  authMiddleware("availability", "create"),
+  TutorController.setAvailability
+);
 
 tutorRouter.post(
   "/profile",

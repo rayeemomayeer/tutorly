@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { BookingService } from "./booking.service";
 
+
 const createBooking = async (req: Request, res: Response) => {
-  const { tutorId, date, duration } = req.body;
+  const { tutorId, scheduledAt } = req.body;
   const studentId = (req as any).session.user.id;
-  const booking = await BookingService.createBooking(studentId, tutorId, date, duration);
+  const booking = await BookingService.createBooking(studentId, tutorId, scheduledAt);
   res.status(201).json(booking);
 };
 

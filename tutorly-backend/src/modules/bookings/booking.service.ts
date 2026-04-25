@@ -1,19 +1,17 @@
 import { prisma } from "../../lib/prisma";
 
-const createBooking = async (
-  studentId: string,
-  tutorId: string,
-  scheduledAt: string, 
-  duration: number 
-) => {
+const createBooking = async (studentId: string, tutorId: string, scheduledAt: string) => {
   return prisma.booking.create({
     data: {
       studentId,
       tutorId,
-      scheduledAt: new Date(scheduledAt),
-      status: "CONFIRMED", 
+      scheduledAt: new Date(scheduledAt), 
+      status: "CONFIRMED",
     },
-    include: { student: true, tutor: true },
+    include: {
+      student: true,
+      tutor: true,
+    },
   });
 };
 

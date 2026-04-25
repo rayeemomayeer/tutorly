@@ -1,6 +1,6 @@
 
 "use client";
-import { useCancelBookingMutation } from "./bookingApi";
+import { useCancelBookingMutation } from "@/features/bookings/bookingApi";
 import { Button } from "@/components/ui/button";
 
 export default function CancelBookingButton({ id }: { id: string }) {

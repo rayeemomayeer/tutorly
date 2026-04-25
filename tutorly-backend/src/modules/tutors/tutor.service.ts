@@ -94,14 +94,37 @@ const updateTutorProfile = async (
     include: { subjects: true, user: true },
   });
 };
+
 const deleteTutorProfile = async (id: string) => {
   return prisma.tutorProfile.delete({ where: { id } });
+};
+
+const getAvailability = async (tutorId: string) => {
+  return prisma.availability.findMany({
+    where: { tutorId },
+    orderBy: { startTime: "asc" },
+  });
+};
+
+const setAvailability = async (tutorId: string, slots: any[]) => {
+  // Clear old slots and replace
+  await prisma.availability.deleteMany({ where: { tutorId } });
+  return prisma.availability.createMany({
+    data: slots.map((s) => ({
+      tutorId,
+      dayOfWeek: s.dayOfWeek,
+      startTime: new Date(s.startTime),
+      endTime: new Date(s.endTime),
+    })),
+  });
 };
 
 export const TutorService = {
   getAllTutors,
   getTutorById,
   createTutorProfile,
+  getAvailability,
+  setAvailability,
   updateTutorProfile,
   deleteTutorProfile,
 };

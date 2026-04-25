@@ -8,6 +8,7 @@ const statement = {
   booking: ["create", "read", "cancel", "complete", "list", "delete"],
   review: ["create", "read", "delete"],
   category: ["create", "read", "update", "delete"],
+  availability: ["create", "read", "update", "delete"],
 } as const;
 
 export const ac = createAccessControl(statement);
@@ -19,6 +20,7 @@ export const studentRole = ac.newRole({
   booking: ["create", "read", "cancel"],
   review: ["create", "read"],
   category: ["read"],
+  availability: ["read"],
 });
 
 export const tutorRole = ac.newRole({
@@ -28,6 +30,7 @@ export const tutorRole = ac.newRole({
   booking: ["read", "cancel","complete"],
   review: ["read"],
   category: ["read"],
+  availability: ["create", "read", "update", "delete"],
 });
 
 export const adminRole = ac.newRole({
@@ -37,4 +40,5 @@ export const adminRole = ac.newRole({
   booking: ["create", "read", "cancel", "complete", "list", "delete"],
   review: ["read", "delete"],
   category: ["create", "read", "update", "delete"],
+  availability: ["read", "delete"],
 });

@@ -1,4 +1,4 @@
-// src/features/adminCategories/CategoryForm.tsx
+
 "use client";
 import { useState } from "react";
 import { useCreateCategoryMutation } from "./adminCategoryApi";

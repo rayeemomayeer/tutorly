@@ -1,6 +1,6 @@
 
 "use client";
-import { useCompleteBookingMutation } from "./tutorBookingApi";
+import { useCompleteBookingMutation } from "@/features/bookings/bookingApi";
 import { Button } from "@/components/ui/button";
 
 export default function CompleteBookingButton({ id }: { id: string }) {

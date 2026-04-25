@@ -18,8 +18,6 @@ const getAllTutors = async (req: Request, res: Response) => {
   res.json(result);
 };
 
-
-
 const getTutorById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const tutor = await TutorService.getTutorById(id as string);
@@ -52,10 +50,25 @@ const deleteTutorProfile = async (req: Request, res: Response) => {
   res.status(204).send();
 };
 
+const getAvailability = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const availability = await TutorService.getAvailability(id as string);
+  res.json(availability);
+};
+
+const setAvailability = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const slots = req.body; // array of { dayOfWeek, startTime, endTime }
+  const updated = await TutorService.setAvailability(id as string, slots);
+  res.status(201).json(updated);
+};
+
 export const TutorController = {
   getAllTutors,
   getTutorById,
   createTutorProfile,
+  getAvailability,
+  setAvailability,
   updateTutorProfile,
   deleteTutorProfile,
 };
