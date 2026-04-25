@@ -4,10 +4,13 @@ import { useParams } from "next/navigation";
 import { useGetTutorBookingsQuery } from "@/features/bookings/bookingApi";
 import CancelBookingButton from "./CancelBookingButton";
 import CompleteBookingButton from "./CompleteBookingButton";
+import { useGetTutorByIdQuery } from "../tutors/tutorApi";
 
 export default function TutorBookings() {
   const { id } = useParams();
-  const { data, isLoading } = useGetTutorBookingsQuery(id as string);
+  const { data: tutor } = useGetTutorByIdQuery(id as string);
+  const { data, isLoading } = useGetTutorBookingsQuery(tutor?.user.id as string);
+
 
   if (isLoading) return <p>Loading bookings...</p>;
   if (!data || data.length === 0) return <p>No bookings yet.</p>;

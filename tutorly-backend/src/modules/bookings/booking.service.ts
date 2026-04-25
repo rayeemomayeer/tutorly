@@ -17,11 +17,23 @@ const createBooking = async (studentId: string, tutorId: string, scheduledAt: st
 
 
 const getBookings = async (userId: string, role: string) => {
-  if (role === "student") {
-    return prisma.booking.findMany({ where: { studentId: userId } });
+   if (role === "student") {
+    return prisma.booking.findMany({
+      where: { studentId: userId },
+      include: {
+        tutor: true,
+      },
+      orderBy: { scheduledAt: "asc" },
+    });
   }
   if (role === "tutor") {
-    return prisma.booking.findMany({ where: { tutorId: userId } });
+    return prisma.booking.findMany({
+      where: { tutorId: userId },
+      include: {
+        student: true,
+      },
+      orderBy: { scheduledAt: "asc" },
+    });
   }
   if (role === "admin") {
     return prisma.booking.findMany();

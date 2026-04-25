@@ -63,6 +63,14 @@ const setAvailability = async (req: Request, res: Response) => {
   res.status(201).json(updated);
 };
 
+const getTutorBookings = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const bookings = await TutorService.getTutorBookings(id as string);
+
+  res.json(bookings);
+};
+
 export const TutorController = {
   getAllTutors,
   getTutorById,
@@ -71,4 +79,5 @@ export const TutorController = {
   setAvailability,
   updateTutorProfile,
   deleteTutorProfile,
+  getTutorBookings,
 };

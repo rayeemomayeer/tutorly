@@ -22,7 +22,7 @@ export default function StudentBookings() {
           <div>
             <p>Status: {booking.status}</p>
             <p>Scheduled: {new Date(booking.scheduledAt).toLocaleString()}</p>
-            <p>Tutor: {booking.tutor?.name || "Unknown"}</p>
+            <p>Tutor: {booking.tutor?.name}</p>
           </div>
           {booking.status === "CONFIRMED" && (
             <CancelBookingButton id={booking.id} />

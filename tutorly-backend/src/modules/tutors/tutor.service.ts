@@ -119,6 +119,14 @@ const setAvailability = async (tutorId: string, slots: any[]) => {
   });
 };
 
+const getTutorBookings = async (tutorId: string) => {
+  return prisma.booking.findMany({
+    where: { tutorId },
+    include: { student: true },
+    orderBy: { scheduledAt: "asc" },
+  });
+};
+
 export const TutorService = {
   getAllTutors,
   getTutorById,
@@ -127,4 +135,5 @@ export const TutorService = {
   setAvailability,
   updateTutorProfile,
   deleteTutorProfile,
+  getTutorBookings,
 };

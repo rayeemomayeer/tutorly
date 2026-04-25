@@ -14,6 +14,13 @@ tutorRouter.get("/", authMiddleware("tutor", "read"), TutorController.getAllTuto
 tutorRouter.get("/:id", authMiddleware("tutor", "read"), TutorController.getTutorById);
 
 tutorRouter.get(
+  "/:id/bookings",
+  authMiddleware("booking", "read"),
+  TutorController.getTutorBookings
+);
+
+
+tutorRouter.get(
   "/:id/availability",
   authMiddleware("availability", "read"),
   TutorController.getAvailability
