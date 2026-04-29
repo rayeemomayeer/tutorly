@@ -1,23 +1,45 @@
 import { prisma } from "../../lib/prisma";
+import { TutorService } from "../tutors/tutor.service";
 
-const createBooking = async (studentId: string, tutorId: string, scheduledAt: string) => {
+const createBooking = async (
+  studentId: string,
+  tutorId: string,
+  scheduledAt: string,
+  slotId: string
+) => {
+  const slot = await prisma.availability.findUnique({ where: { id: slotId } });
+
+  if (!slot || slot.status === "BOOKED") {
+    throw new Error("Selected slot is no longer available");
+  }
+
+  await prisma.availability.update({
+    where: { id: slotId },
+    data: { status: "BOOKED" },
+  });
+
+  // broadcast BOOKED event via SSE
+  TutorService.broadcast(tutorId, {
+    type: "BOOKED",
+    slotId,
+  });
+
   return prisma.booking.create({
     data: {
       studentId,
       tutorId,
-      scheduledAt: new Date(scheduledAt), 
+      slotId, 
+      scheduledAt: new Date(scheduledAt),
       status: "CONFIRMED",
     },
-    include: {
-      student: true,
-      tutor: true,
-    },
+    include: { student: true, tutor: true, slot: true },
   });
 };
 
 
+
 const getBookings = async (userId: string, role: string) => {
-   if (role === "student") {
+  if (role === "student") {
     return prisma.booking.findMany({
       where: { studentId: userId },
       include: {
@@ -42,11 +64,28 @@ const getBookings = async (userId: string, role: string) => {
 };
 
 const cancelBooking = async (id: string) => {
-  return prisma.booking.update({
+  const booking = await prisma.booking.update({
     where: { id },
     data: { status: "CANCELLED" },
+    include: { tutor: true, slot: true },
   });
+
+  if (booking.slotId) {
+    await prisma.availability.update({
+      where: { id: booking.slotId },
+      data: { status: "OPEN" },
+    });
+
+    TutorService.broadcast(booking.tutorId, {
+      type: "OPEN",
+      slotId: booking.slotId,
+    });
+  }
+
+  return booking;
 };
+
+
 
 const completeBooking = async (id: string) => {
   return prisma.booking.update({

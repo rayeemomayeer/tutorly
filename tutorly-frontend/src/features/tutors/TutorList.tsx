@@ -1,13 +1,12 @@
 
 "use client";
 
-import { useGetTutorsQuery } from "./tutorApi";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
-import { useCreateBookingMutation } from "../bookings/bookingApi";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useGetTutorsQuery } from "./tutorApi";
 
 export default function TutorList() {
   const [search, setSearch] = useState("");
@@ -15,9 +14,6 @@ export default function TutorList() {
   const [minRate, setMinRate] = useState<number | undefined>();
   const [maxRate, setMaxRate] = useState<number | undefined>();
   const [page, setPage] = useState(1);
-
-  const [createBooking, { isLoading: isBooking }] = useCreateBookingMutation();
-  const [bookingTutorId, setBookingTutorId] = useState<string | null>(null);
 
   const { data, isLoading } = useGetTutorsQuery({
     page,
@@ -34,24 +30,6 @@ export default function TutorList() {
 
   if (isLoading) return <p>Loading tutors...</p>;
   if (!data?.data) return <p>No tutors found.</p>;
-
-
-  const handleBook = async (tutorId: string) => {
-    try {
-      setBookingTutorId(tutorId);
-      await createBooking({
-        tutorId,
-        scheduledAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-      }).unwrap();
-      alert("Booking confirmed!");
-      window.location.href = "/student/bookings";
-    } catch (err) {
-      console.error("Booking failed:", err);
-      alert("Error booking session.");
-    } finally {
-      setBookingTutorId(null);
-    }
-  };
 
   return (
     <div className="space-y-4">

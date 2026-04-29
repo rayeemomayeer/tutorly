@@ -13,12 +13,20 @@ tutorRouter.get("/", authMiddleware("tutor", "read"), TutorController.getAllTuto
 
 tutorRouter.get("/:id", authMiddleware("tutor", "read"), TutorController.getTutorById);
 
+
 tutorRouter.get(
   "/:id/bookings",
   authMiddleware("booking", "read"),
   TutorController.getTutorBookings
 );
 
+
+
+tutorRouter.get(
+  "/:id/availability/stream",
+  authMiddleware("availability", "read"),
+  TutorController.streamAvailability
+);
 
 tutorRouter.get(
   "/:id/availability",
@@ -32,13 +40,31 @@ tutorRouter.post(
   TutorController.setAvailability
 );
 
+tutorRouter.put(
+  "/:tutorId/availability/:slotId",
+  authMiddleware("availability", "update"),
+  TutorController.updateAvailabilitySlot
+);
+
+tutorRouter.delete(
+  "/:tutorId/availability/:slotId",
+  authMiddleware("availability", "delete"),
+  TutorController.deleteAvailabilitySlot
+);
+
+
+
+
+
+
+
+
 tutorRouter.post(
   "/profile",
   authMiddleware("tutor", "create"),
   validate(createTutorProfileSchema),
   TutorController.createTutorProfile
 );
-
 
 tutorRouter.put(
   "/profile/:id",

@@ -17,7 +17,23 @@ export const availabilityApi = createApi({
       }),
       invalidatesTags: ["Availability"],
     }),
+    updateAvailability: builder.mutation({
+      query: ({ tutorId, slotId, slot }) => ({
+        url: `/tutors/${tutorId}/availability/${slotId}`,
+        method: "PUT",
+        body: slot,
+      }),
+      invalidatesTags: ["Availability"],
+    }),
+    deleteAvailability: builder.mutation({
+      query: ({ tutorId, slotId }) => ({
+        url: `/tutors/${tutorId}/availability/${slotId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Availability"],
+    }),
+
   }),
 });
 
-export const { useGetAvailabilityQuery, useSetAvailabilityMutation } = availabilityApi;
+export const { useGetAvailabilityQuery, useSetAvailabilityMutation, useUpdateAvailabilityMutation, useDeleteAvailabilityMutation } = availabilityApi;

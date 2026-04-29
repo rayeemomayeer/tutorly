@@ -115,12 +115,14 @@ model Booking {
   id          String        @id @default(uuid())
   studentId   String
   tutorId     String
+  slotId      String
   status      BookingStatus @default(CONFIRMED)
   scheduledAt DateTime
   createdAt   DateTime      @default(now())
 
   student User @relation("StudentBookings", fields: [studentId], references: [id])
   tutor   User @relation("TutorBookings", fields: [tutorId], references: [id])
+  slot    Availability @relation(fields: [slotId], references: [id])
 }
 
 enum BookingStatus {
@@ -147,6 +149,14 @@ model Availability {
   dayOfWeek Int
   startTime DateTime
   endTime   DateTime
+  status    AvailabilityStatus @default(OPEN)
+  deleted   Boolean @default(false)
 
   tutor TutorProfile @relation(fields: [tutorId], references: [id])
+  bookings Booking[]
+}
+
+enum AvailabilityStatus {
+  OPEN
+  BOOKED
 }

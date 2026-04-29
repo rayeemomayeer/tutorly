@@ -3,9 +3,9 @@ import { BookingService } from "./booking.service";
 
 
 const createBooking = async (req: Request, res: Response) => {
-  const { tutorId, scheduledAt } = req.body;
+  const { tutorId, scheduledAt, slotId } = req.body;
   const studentId = (req as any).session.user.id;
-  const booking = await BookingService.createBooking(studentId, tutorId, scheduledAt);
+  const booking = await BookingService.createBooking(studentId, tutorId, scheduledAt, slotId);
   res.status(201).json(booking);
 };
 

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { TutorService } from "./tutor.service";
 import { TutorFilters } from "./tutor.types";
+import config from "src/config/env";
 
 
 const getAllTutors = async (req: Request, res: Response) => {
@@ -44,6 +45,7 @@ const updateTutorProfile = async (req: Request, res: Response) => {
 
   res.json(profile);
 };
+
 const deleteTutorProfile = async (req: Request, res: Response) => {
   const { id } = req.params;
   await TutorService.deleteTutorProfile(id as string);
@@ -58,10 +60,50 @@ const getAvailability = async (req: Request, res: Response) => {
 
 const setAvailability = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const slots = req.body; // array of { dayOfWeek, startTime, endTime }
+  const slots = req.body; 
   const updated = await TutorService.setAvailability(id as string, slots);
   res.status(201).json(updated);
 };
+
+const updateAvailabilitySlot = async (req: Request, res: Response) => {
+  const { tutorId, slotId } = req.params;
+  const { dayOfWeek, startTime, endTime } = req.body;
+  const updated = await TutorService.updateAvailabilitySlot(tutorId as string, slotId as string, dayOfWeek, startTime, endTime);
+  res.json(updated);
+};
+
+const deleteAvailabilitySlot = async (req: Request, res: Response) => {
+  const { slotId } = req.params;
+  await TutorService.markSlotDeleted(slotId as string);
+  res.status(200).json({ message: "Slot deleted (soft delete)" });
+};
+
+
+const streamAvailability = async (req: Request, res: Response) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("Access-Control-Allow-Origin", config.APP_URL || "http://localhost:3000");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  res.flushHeaders();
+
+  const tutorId = req.params.id;
+  TutorService.addClient(tutorId as string, res);
+
+  // heartbeat every 30s
+  const interval = setInterval(() => {
+    res.write(`data: ${JSON.stringify({ type: "PING" })}\n\n`);
+  }, 30000);
+
+  req.on("close", () => {
+    clearInterval(interval);
+    TutorService.removeClient(tutorId as string, res);
+  });
+};
+
+
+
 
 const getTutorBookings = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -80,4 +122,7 @@ export const TutorController = {
   updateTutorProfile,
   deleteTutorProfile,
   getTutorBookings,
+  updateAvailabilitySlot,
+  deleteAvailabilitySlot,
+  streamAvailability,
 };
