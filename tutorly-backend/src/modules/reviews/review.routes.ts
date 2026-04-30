@@ -15,7 +15,6 @@ reviewRouter.post(
   ReviewController.createReview
 );
 
-
 reviewRouter.get("/:tutorId", authMiddleware("review", "read"), ReviewController.getReviewsByTutor);
 
 

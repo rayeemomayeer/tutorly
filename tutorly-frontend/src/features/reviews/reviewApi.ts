@@ -11,9 +11,9 @@ export const reviewApi = createApi({
     }),
     createReview: builder.mutation({
       query: ({ tutorId, rating, comment }) => ({
-        url: `/reviews/${tutorId}`,
+        url: `/reviews`,
         method: "POST",
-        body: { rating, comment },
+        body: { tutorId, rating, comment },
       }),
       invalidatesTags: ["Review"],
     }),

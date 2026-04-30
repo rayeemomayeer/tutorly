@@ -30,6 +30,7 @@ model User {
   studentBookings Booking[] @relation("StudentBookings")
   tutorBookings   Booking[] @relation("TutorBookings")
   studentReviews  Review[]  @relation("StudentReviews")
+  tutorReviews Review[] @relation("TutorReviews")
 
   role       String?
   banned     Boolean?  @default(false)
@@ -101,7 +102,6 @@ model TutorProfile {
   hourlyRate   Float
   subjects     Category[]
   availability Availability[]
-  reviews      Review[]
   user         User           @relation(fields: [userId], references: [id])
 }
 
@@ -139,9 +139,10 @@ model Review {
   comment   String?
   createdAt DateTime @default(now())
 
-  student User         @relation("StudentReviews", fields: [studentId], references: [id])
-  tutor   TutorProfile @relation(fields: [tutorId], references: [id])
+  student User @relation("StudentReviews", fields: [studentId], references: [id])
+  tutor   User @relation("TutorReviews", fields: [tutorId], references: [id])  
 }
+
 
 model Availability {
   id        String   @id @default(uuid())

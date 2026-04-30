@@ -18,7 +18,7 @@ export const studentRole = ac.newRole({
   user: ["read", "update"],
   tutor: ["read"],
   booking: ["create", "read", "cancel"],
-  review: ["create", "read"],
+  review: ["create", "read", "delete"],
   category: ["read"],
   availability: ["read"],
 });

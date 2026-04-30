@@ -11,6 +11,7 @@ import { useCreateBookingMutation } from "@/features/bookings/bookingApi";
 import ReviewList from "@/features/reviews/ReviewList";
 import ReviewForm from "@/features/reviews/ReviewForm";
 import { Button } from "@/components/ui/button";
+import { useGetSessionQuery } from "@/features/auth/authApi";
 
 type Slot = {
   id: string;
@@ -29,6 +30,13 @@ export default function TutorProfilePage({
   const router = useRouter();
 
   const { data: tutor, isLoading } = useGetTutorByIdQuery(id);
+
+  const { data: session, isLoading: isSessionLoading } = useGetSessionQuery();
+  if (isSessionLoading) return <p>Loading session...</p>;
+  if (!session) {
+    router.push("/login");
+    return <p>Redirecting to login...</p>;
+  }
 
   const {
     data: availability,
@@ -100,7 +108,7 @@ export default function TutorProfilePage({
           )
         );
       }
-      
+
       if (data.type === "DELETED") {
         setLocalAvailability(prev =>
           prev.filter(s => s.id !== data.slotId)
@@ -199,8 +207,9 @@ export default function TutorProfilePage({
         <p>No available slots.</p>
       )}
 
-      <ReviewForm tutorId={id} />
-      <ReviewList tutorId={id} />
+      <ReviewForm tutorId={tutor.user.id} />   
+      <ReviewList tutorId={tutor.user.id} />
+
     </div>
   );
 }

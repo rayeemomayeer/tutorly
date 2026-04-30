@@ -1,9 +1,7 @@
 import { z } from "zod";
 
 export const createReviewSchema = z.object({
-  tutorId: z.uuid({
-    message: "Tutor ID must be a valid UUID",
-  }),
-  rating: z.number().min(1).max(5),
-  comment: z.string().min(5, "Comment must be at least 5 characters"),
+  tutorId: z.string().min(1, "Tutor ID is required"),
+  rating: z.coerce.number().min(1).max(5, "Rating must be between 1 and 5"), 
+  comment: z.string().trim().min(1, "Comment is required"),
 });

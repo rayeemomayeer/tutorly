@@ -6,6 +6,38 @@ const createReview = async (
   rating: number,
   comment: string
 ) => {
+
+  //testing
+
+  const bookingsAnyStatus = await prisma.booking.findMany({
+    where: { studentId, tutorId },
+  });
+  console.log("Bookings for student/tutor:", bookingsAnyStatus);
+
+
+  //
+
+
+  const existing = await prisma.review.findFirst({
+    where: { studentId, tutorId },
+  });
+
+  if (existing) {
+    throw new Error("You have already reviewed this tutor.");
+  }
+
+  const booking = await prisma.booking.findFirst({
+    where: {
+      studentId,
+      tutorId,
+      status: "COMPLETED",
+    },
+  });
+
+  if (!booking) {
+    throw new Error("You can only review tutors after completing a booking.");
+  }
+
   return prisma.review.create({
     data: {
       studentId,
@@ -22,12 +54,32 @@ const getReviewsByTutor = async (tutorId: string) => {
     where: { tutorId },
     include: { student: { select: { id: true, name: true } } },
     orderBy: { createdAt: "desc" },
-
   });
 };
 
-const deleteReview = async (id: string) => {
-  return prisma.review.delete({ where: { id } });
+const deleteReview = async (id: string, userId: string, userRole: string) => {
+  const review = await prisma.review.findUnique({
+    where: { id },
+    include: { tutor: true, student: true },
+  });
+
+  if (!review) {
+    throw new Error("Review not found");
+  }
+
+  const isAuthor = review.studentId === userId;
+  const isTutor = review.tutorId === userId;
+  const isAdmin = userRole === "admin";
+
+  if (!isAuthor && !isTutor && !isAdmin) {
+    throw new Error("Not authorized to delete this review");
+  }
+
+  await prisma.review.delete({
+    where: { id },
+  });
+
+  return { message: "Review deleted successfully" };
 };
 
 export const ReviewService = {

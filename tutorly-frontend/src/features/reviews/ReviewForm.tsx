@@ -10,9 +10,9 @@ export default function ReviewForm({ tutorId }: { tutorId: string }) {
   const [comment, setComment] = useState("");
   const [createReview, { isLoading }] = useCreateReviewMutation();
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createReview({ tutorId, rating, comment });
+    await createReview({ tutorId, rating: Number(rating), comment }); // ✅ no studentId
     setRating(5);
     setComment("");
   };
