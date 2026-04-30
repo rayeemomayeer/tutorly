@@ -7,16 +7,6 @@ const createReview = async (
   comment: string
 ) => {
 
-  //testing
-
-  const bookingsAnyStatus = await prisma.booking.findMany({
-    where: { studentId, tutorId },
-  });
-  console.log("Bookings for student/tutor:", bookingsAnyStatus);
-
-
-  //
-
 
   const existing = await prisma.review.findFirst({
     where: { studentId, tutorId },

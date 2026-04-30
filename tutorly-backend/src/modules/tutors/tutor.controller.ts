@@ -91,10 +91,10 @@ const streamAvailability = async (req: Request, res: Response) => {
   const tutorId = req.params.id;
   TutorService.addClient(tutorId as string, res);
 
-  // heartbeat every 30s
+  // heartbeat every 10s
   const interval = setInterval(() => {
     res.write(`data: ${JSON.stringify({ type: "PING" })}\n\n`);
-  }, 30000);
+  }, 10000);
 
   req.on("close", () => {
     clearInterval(interval);

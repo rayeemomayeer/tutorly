@@ -76,13 +76,14 @@ export default function TutorProfilePage({
   // -----------------------------
   // SSE REAL-TIME STREAM
   // -----------------------------
+
+  console.log(id)
   useEffect(() => {
     if (!id) return;
-
     const eventSource = new EventSourcePolyfill(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/tutors/${id}/availability/stream`,
       {
-        withCredentials: true, // send cookies/session
+        withCredentials: true, 
       }
     );
 
@@ -129,6 +130,7 @@ export default function TutorProfilePage({
       eventSource.close();
     };
 
+    
     return () => {
       eventSource.close();
     };
