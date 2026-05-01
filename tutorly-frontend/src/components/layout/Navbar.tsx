@@ -1,6 +1,7 @@
 "use client";
 
 import LogoutButton from "@/features/auth/LogoutButton";
+import { useGetTutorsQuery } from "@/features/tutors/tutorApi";
 import type { RootState } from "@/lib/store";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,13 +24,12 @@ type NavLink = {
 
 const PUBLIC_LINKS: NavLink[] = [
   { label: "How it works", href: "/#how-it-works" },
-];
+];  
 
 const STUDENT_LINKS: NavLink[] = [
   { label: "Browse tutors", href: "/tutors" },
-  { label: "Dashboard", href: "/student" },
+  { label: "Profile", href: "/student" },
   { label: "My bookings", href: "/student/bookings" },
-  { label: "Profile", href: "/student/profile" },
 ];
 
 const ADMIN_LINKS: NavLink[] = [
@@ -40,17 +40,17 @@ const ADMIN_LINKS: NavLink[] = [
   { label: "Browse tutors", href: "/tutors" },
 ];
 
-function getTutorProfileId(user: AuthUser | null) {
-  return user?.tutorId ?? user?.tutorProfile?.id ?? user?.tutor?.id ?? user?.id;
+function getTutorProfileId(user: AuthUser | null, resolvedTutorProfileId?: string) {
+  return resolvedTutorProfileId ?? user?.tutorProfile?.id ?? user?.tutor?.id ?? user?.tutorId;
 }
 
-function getRoleLinks(user: AuthUser | null): NavLink[] {
+function getRoleLinks(user: AuthUser | null, tutorProfileId?: string): NavLink[] {
   if (!user?.role) return PUBLIC_LINKS;
 
   if (user.role === "admin") return ADMIN_LINKS;
 
   if (user.role === "tutor") {
-    const tutorId = getTutorProfileId(user);
+    const tutorId = getTutorProfileId(user, tutorProfileId);
 
     return [
       { label: "Browse tutors", href: "/tutors" },
@@ -81,7 +81,12 @@ export function Navbar() {
   const user = useSelector(
     (state: RootState) => state.auth.user as AuthUser | null
   );
-  const navLinks = getRoleLinks(user);
+  const { data: tutors } = useGetTutorsQuery(
+    { page: 1, limit: 100 },
+    { skip: user?.role !== "tutor" }
+  );
+  const tutorProfileId = tutors?.data.find((tutor) => tutor.user.id === user?.id)?.id;
+  const navLinks = getRoleLinks(user, tutorProfileId);
 
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between px-10 py-5 bg-[#fafaf8] border-b border-[#e5e3de]">
