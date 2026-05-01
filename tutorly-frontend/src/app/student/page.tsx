@@ -50,7 +50,7 @@ export default function StudentProfilePage() {
   ];
 
   return (
-    <div className="p-6">
+    <div className="h-[80vh] flex items-center justify-center p-6">
       <Card className="max-w-2xl">
         <CardHeader>
           <div className="flex items-center gap-4">
