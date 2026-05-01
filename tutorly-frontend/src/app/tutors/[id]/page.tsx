@@ -65,7 +65,7 @@ export default function TutorProfilePage({
   }, [availability]);
 
   // -----------------------------
-  // ERROR HANDLING (safe)
+  // ERROR HANDLING
   // -----------------------------
   useEffect(() => {
     if (error) {

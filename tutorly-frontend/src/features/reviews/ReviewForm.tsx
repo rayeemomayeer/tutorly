@@ -12,7 +12,7 @@ export default function ReviewForm({ tutorId }: { tutorId: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createReview({ tutorId, rating: Number(rating), comment }); // ✅ no studentId
+    await createReview({ tutorId, rating: Number(rating), comment });
     setRating(5);
     setComment("");
   };
