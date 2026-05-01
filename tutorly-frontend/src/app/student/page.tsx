@@ -1,5 +1,5 @@
 
-import BookingList from "@/features/bookings/StudentBooking";
+import BookingList from "@/features/bookings/StudentBookings";
 
 export default function DashboardPage() {
   return (
