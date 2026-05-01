@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { demoBaseQuery } from "@/lib/demoBaseQuery";
+import { createApi } from "@reduxjs/toolkit/query/react";
 
 export type TutorFilters = {
   page?: number;
@@ -40,7 +41,7 @@ export type TutorListResponse = {
 
 export const tutorApi = createApi({
   reducerPath: "tutorApi",
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL, credentials: "include" }), 
+  baseQuery: demoBaseQuery(process.env.NEXT_PUBLIC_API_BASE_URL),
   tagTypes: ["Tutor"],
   endpoints: (builder) => ({
     getTutors: builder.query<TutorListResponse, TutorFilters>({

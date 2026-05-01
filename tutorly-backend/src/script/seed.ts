@@ -100,6 +100,29 @@ async function main() {
   }
 
   console.log("🌱 Seeding complete.");
+  // Student
+  const studentEmail = "student@tutorly.com";
+  const studentPassword = "StudentPass123!";
+
+  try {
+    const { data: studentData } = await axios.post(API_URL, {
+      name: "Demo Student",
+      email: studentEmail,
+      password: studentPassword,
+    });
+
+    await prisma.user.update({
+      where: { email: studentEmail },
+      data: { role: "student" },
+    });
+
+    console.log(" Student user seeded via Better Auth:", studentData.email);
+  } catch (err: any) {
+    console.error(
+      " Error seeding student:",
+      err.response?.data || err.message
+    );
+  }
 }
 
 main()

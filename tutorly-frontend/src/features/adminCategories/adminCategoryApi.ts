@@ -1,15 +1,21 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { demoBaseQuery } from "@/lib/demoBaseQuery";
+import { createApi } from "@reduxjs/toolkit/query/react";
+
+type AdminCategory = {
+    id: string;
+    name: string;
+};
 
 export const adminCategoryApi = createApi({
     reducerPath: "adminCategoryApi",
-    baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL, credentials: "include" }),
+    baseQuery: demoBaseQuery(process.env.NEXT_PUBLIC_API_BASE_URL),
     tagTypes: ["AdminCategory"],
     endpoints: (builder) => ({
-        getCategories: builder.query<any[], void>({
+        getCategories: builder.query<AdminCategory[], void>({
             query: () => "/category",
             providesTags: ["AdminCategory"],
         }),
-        createCategory: builder.mutation({
+        createCategory: builder.mutation<AdminCategory, { name: string }>({
             query: (body) => ({
                 url: "/category",
                 method: "POST",
@@ -36,7 +42,7 @@ export const adminCategoryApi = createApi({
                 }
             },
         }),
-        updateCategory: builder.mutation({
+        updateCategory: builder.mutation<unknown, { id: string; name: string }>({
             query: ({ id, name }: { id: string; name: string }) => ({
                 url: `/category/${id}`,
                 method: "PATCH",
@@ -56,7 +62,7 @@ export const adminCategoryApi = createApi({
                 }
             },
         }),
-        deleteCategory: builder.mutation({
+        deleteCategory: builder.mutation<unknown, string>({
             query: (id: string) => ({
                 url: `/category/${id}`,
                 method: "DELETE",

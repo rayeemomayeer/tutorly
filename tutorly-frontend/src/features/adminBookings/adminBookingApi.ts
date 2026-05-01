@@ -1,5 +1,6 @@
 
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { demoBaseQuery } from "@/lib/demoBaseQuery";
+import { createApi } from "@reduxjs/toolkit/query/react";
 
 export type AdminBooking = {
   id: string;
@@ -15,7 +16,7 @@ export type AdminBooking = {
 
 export const adminBookingApi = createApi({
   reducerPath: "adminBookingApi",
-  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}`, credentials: "include" }),
+  baseQuery: demoBaseQuery(process.env.NEXT_PUBLIC_API_BASE_URL),
   tagTypes: ["AdminBooking"],
   endpoints: (builder) => ({
     getAllBookings: builder.query<AdminBooking[], void>({

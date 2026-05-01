@@ -1,24 +1,41 @@
 
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { demoBaseQuery } from "@/lib/demoBaseQuery";
+import { createApi } from "@reduxjs/toolkit/query/react";
+
+type AdminUser = {
+    id: string;
+    name?: string | null;
+    email?: string;
+    role?: string;
+    banned?: boolean;
+};
+
+type AdminUsersResponse = {
+    data: AdminUser[];
+    meta: {
+        total?: number;
+        totalPages: number;
+    };
+};
 
 export const adminApi = createApi({
     reducerPath: "adminApi",
-    baseQuery: fetchBaseQuery({ baseUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}`, credentials: "include" }),
+    baseQuery: demoBaseQuery(process.env.NEXT_PUBLIC_API_BASE_URL),
     tagTypes: ["AdminUser", "AdminBooking", "AdminCategory"],
     endpoints: (builder) => ({
-        getUsers: builder.query<any, { page?: number; limit?: number }>({
+        getUsers: builder.query<AdminUsersResponse, { page?: number; limit?: number }>({
             query: ({ page = 1, limit = 5 }) => `/admin/users?page=${page}&limit=${limit}`,
             providesTags: ["AdminUser"],
         }),
-        banUser: builder.mutation({
+        banUser: builder.mutation<unknown, string>({
             query: (id: string) => ({
                 url: `/admin/users/${id}/ban`,
                 method: "PATCH",
             }),
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
                 const patchResult = dispatch(
-                    adminApi.util.updateQueryData("getUsers", { page: 1, limit: 5 }, (draft: any) => {
-                        const user = draft.data.find((u: any) => u.id === id);
+                    adminApi.util.updateQueryData("getUsers", { page: 1, limit: 5 }, (draft) => {
+                        const user = draft.data.find((u) => u.id === id);
                         if (user) user.banned = true;
                     })
                 );
@@ -29,15 +46,15 @@ export const adminApi = createApi({
                 }
             },
         }),
-        unbanUser: builder.mutation({
+        unbanUser: builder.mutation<unknown, string>({
             query: (id: string) => ({
                 url: `/admin/users/${id}/unban`,
                 method: "PATCH",
             }),
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
                 const patchResult = dispatch(
-                    adminApi.util.updateQueryData("getUsers", { page: 1, limit: 5 }, (draft: any) => {
-                        const user = draft.data.find((u: any) => u.id === id);
+                    adminApi.util.updateQueryData("getUsers", { page: 1, limit: 5 }, (draft) => {
+                        const user = draft.data.find((u) => u.id === id);
                         if (user) user.banned = false;
                     })
                 );
@@ -48,7 +65,7 @@ export const adminApi = createApi({
                 }
             },
         }),
-        promoteUser: builder.mutation({
+        promoteUser: builder.mutation<unknown, { id: string; role: string }>({
             query: ({ id, role }) => ({
                 url: `/admin/users/${id}/promote`,
                 method: "PATCH",
@@ -56,8 +73,8 @@ export const adminApi = createApi({
             }),
             async onQueryStarted({ id, role }, { dispatch, queryFulfilled }) {
                 const patchResult = dispatch(
-                    adminApi.util.updateQueryData("getUsers", { page: 1, limit: 5 }, (draft: any) => {
-                        const user = draft.data.find((u: any) => u.id === id);
+                    adminApi.util.updateQueryData("getUsers", { page: 1, limit: 5 }, (draft) => {
+                        const user = draft.data.find((u) => u.id === id);
                         if (user) user.role = role;
                     })
                 );
@@ -70,7 +87,7 @@ export const adminApi = createApi({
         }),
 
 
-        demoteUser: builder.mutation({
+        demoteUser: builder.mutation<unknown, { id: string; role: "student" | "tutor" }>({
             query: ({ id, role }: { id: string; role: "student" | "tutor" }) => ({
                 url: `/admin/users/${id}/demote`,
                 method: "PATCH",
@@ -81,8 +98,8 @@ export const adminApi = createApi({
                     adminApi.util.updateQueryData(
                         "getUsers",
                         { page: 1, limit: 5 },
-                        (draft: any) => {
-                            const user = draft.data.find((u: any) => u.id === id);
+                        (draft) => {
+                            const user = draft.data.find((u) => u.id === id);
                             if (user) user.role = role;
                         }
                     )
