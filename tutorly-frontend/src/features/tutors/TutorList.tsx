@@ -6,6 +6,8 @@ import { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useGetTutorsQuery } from "./tutorApi";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useGetCategoriesQuery } from "@/features/adminCategories/adminCategoryApi";
+import type { RootState } from "@/lib/store";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 type Subject = { id: string; name: string };
@@ -17,6 +19,7 @@ type Tutor = {
   subjects: Subject[];
   tutorReviews?: { rating: number }[];
 };
+type AuthUser = { id?: string; role?: string };
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function getInitials(name: string) {
@@ -229,12 +232,16 @@ function TutorCard({
 function FilterSidebar({
   search, setSearch,
   categoryId, setCategoryId,
+  categories,
+  selectedCategoryName,
   minRate, setMinRate,
   maxRate, setMaxRate,
   onReset,
 }: {
   search: string;       setSearch: (v: string) => void;
   categoryId: string;   setCategoryId: (v: string) => void;
+  categories: Subject[];
+  selectedCategoryName: string;
   minRate: number | undefined;   setMinRate: (v: number | undefined) => void;
   maxRate: number | undefined;   setMaxRate: (v: number | undefined) => void;
   onReset: () => void;
@@ -275,26 +282,22 @@ function FilterSidebar({
 
       {/* Subject / Category */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-[#6b6b66]">Subject ID</label>
-        {/*
-          TODO: Replace this with a <select> once you have a
-          useGetCategoriesQuery() hook available.
-          e.g.:
-            <select value={categoryId} onChange={e => setCategoryId(e.target.value)}>
-              <option value="">All subjects</option>
-              {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-        */}
-        <input
-          type="text"
-          placeholder="Category ID"
+        <label className="text-xs font-medium text-[#6b6b66]">Subject</label>
+        <select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
           className="w-full text-sm text-[#1a1a18] bg-white border border-[#e5e3de]
                      rounded-md px-3 py-2 placeholder:text-[#c4c2bd] placeholder:font-light
                      focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100
                      transition-colors"
-        />
+        >
+          <option value="">All subjects</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Hourly rate range */}
@@ -341,14 +344,14 @@ function FilterSidebar({
             {search && (
               <span className="inline-flex items-center gap-1 text-[11px] text-indigo-600
                                bg-indigo-50 px-2 py-0.5 rounded-full">
-                "{search}"
+                {search}
                 <button onClick={() => setSearch("")} className="ml-0.5 hover:text-indigo-800">×</button>
               </span>
             )}
             {categoryId && (
               <span className="inline-flex items-center gap-1 text-[11px] text-indigo-600
                                bg-indigo-50 px-2 py-0.5 rounded-full">
-                Cat: {categoryId}
+                {selectedCategoryName || "Subject"}
                 <button onClick={() => setCategoryId("")} className="ml-0.5 hover:text-indigo-800">×</button>
               </span>
             )}
@@ -402,8 +405,6 @@ function Pagination({
   onPrev: () => void;
   onNext: () => void;
 }) {
-  if (totalPages <= 1) return null;
-
   // Show a window of page numbers around the current page
   const pages = useMemo(() => {
     const range: (number | "…")[] = [];
@@ -416,6 +417,8 @@ function Pagination({
     }
     return range;
   }, [page, totalPages]);
+
+  if (totalPages <= 1) return null;
 
   return (
     <div className="flex items-center justify-between pt-6 mt-2 border-t border-[#e5e3de]">
@@ -472,8 +475,14 @@ export default function TutorList() {
   const [maxRate, setMaxRate] = useState<number | undefined>();
   const [page, setPage] = useState(1);
 
-  const role = useSelector((state: any) => state.auth?.user?.role);
-  const currentUserId = useSelector((state: any) => state.auth?.user?.id);
+  const authUser = useSelector(
+    (state: RootState) => state.auth.user as AuthUser | null
+  );
+  const role = authUser?.role;
+  const currentUserId = authUser?.id;
+  const { data: categories = [] } = useGetCategoriesQuery();
+  const selectedCategoryName =
+    categories.find((category) => category.id === categoryId)?.name ?? "";
 
   const { data, isLoading } = useGetTutorsQuery({
     page,
@@ -525,6 +534,8 @@ export default function TutorList() {
         <FilterSidebar
           search={search}           setSearch={(v) => { setSearch(v); setPage(1); }}
           categoryId={categoryId}   setCategoryId={(v) => { setCategoryId(v); setPage(1); }}
+          categories={categories}
+          selectedCategoryName={selectedCategoryName}
           minRate={minRate}         setMinRate={(v) => { setMinRate(v); setPage(1); }}
           maxRate={maxRate}         setMaxRate={(v) => { setMaxRate(v); setPage(1); }}
           onReset={handleReset}
