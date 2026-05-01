@@ -9,12 +9,41 @@ export type TutorFilters = {
   search?: string;
 };
 
+export type TutorSubject = {
+  id: string;
+  name: string;
+};
+
+export type Tutor = {
+  id: string;
+  user: {
+    id: string;
+    name: string;
+    image?: string;
+    tutorReviews?: { rating: number }[];
+  };
+  bio: string;
+  hourlyRate: number;
+  subjects: TutorSubject[];
+  tutorReviews?: { rating: number }[];
+  averageRating?: number;
+  reviewCount?: number;
+};
+
+export type TutorListResponse = {
+  data: Tutor[];
+  meta?: {
+    total?: number;
+    totalPages?: number;
+  };
+};
+
 export const tutorApi = createApi({
   reducerPath: "tutorApi",
   baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL, credentials: "include" }), 
   tagTypes: ["Tutor"],
   endpoints: (builder) => ({
-    getTutors: builder.query<any, TutorFilters>({
+    getTutors: builder.query<TutorListResponse, TutorFilters>({
       query: ({ page = 1, limit = 10, categoryId, minRate, maxRate, search }) => {
         const params = new URLSearchParams();
         params.set("page", page.toString());
@@ -28,7 +57,11 @@ export const tutorApi = createApi({
       },
       providesTags: ["Tutor"],
     }),
-    getTutorById: builder.query<any, string>({
+    getFeaturedTutors: builder.query<TutorListResponse, void>({
+      query: () => "/tutors/featured?limit=3",
+      providesTags: ["Tutor"],
+    }),
+    getTutorById: builder.query<Tutor, string>({
       query: (id) => `/tutors/${id}`,
       providesTags: ["Tutor"],
     }),
@@ -60,6 +93,7 @@ export const tutorApi = createApi({
 
 export const {
   useGetTutorsQuery,
+  useGetFeaturedTutorsQuery,
   useGetTutorByIdQuery,
   useCreateTutorProfileMutation,
   useUpdateTutorProfileMutation,

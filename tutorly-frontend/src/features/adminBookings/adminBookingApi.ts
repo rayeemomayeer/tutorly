@@ -1,25 +1,37 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+export type AdminBooking = {
+  id: string;
+  status: string;
+  scheduledAt: string;
+  student?: {
+    name?: string;
+  };
+  tutor?: {
+    name?: string;
+  };
+};
+
 export const adminBookingApi = createApi({
   reducerPath: "adminBookingApi",
   baseQuery: fetchBaseQuery({ baseUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}`, credentials: "include" }),
   tagTypes: ["AdminBooking"],
   endpoints: (builder) => ({
-    getAllBookings: builder.query<any[], void>({
-      query: () => "/booking/admin/all",
+    getAllBookings: builder.query<AdminBooking[], void>({
+      query: () => "/bookings/admin/all",
       providesTags: ["AdminBooking"],
     }),
     cancelBooking: builder.mutation({
       query: (id: string) => ({
-        url: `/booking/${id}/cancel`,
+        url: `/bookings/${id}/cancel`,
         method: "PATCH",
       }),
       invalidatesTags: ["AdminBooking"],
     }),
     completeBooking: builder.mutation({
       query: (id: string) => ({
-        url: `/booking/${id}/complete`,
+        url: `/bookings/${id}/complete`,
         method: "PATCH",
       }),
       invalidatesTags: ["AdminBooking"],

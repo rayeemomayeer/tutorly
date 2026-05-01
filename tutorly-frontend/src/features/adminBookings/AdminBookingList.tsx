@@ -1,6 +1,6 @@
 
 "use client";
-import { useGetAllBookingsQuery } from "./adminBookingApi";
+import { AdminBooking, useGetAllBookingsQuery } from "./adminBookingApi";
 import AdminBookingActions from "./AdminBookingActions";
 
 export default function AdminBookingList() {
@@ -11,7 +11,7 @@ export default function AdminBookingList() {
 
   return (
     <div className="space-y-4">
-      {data.map((booking: any) => (
+      {data.map((booking: AdminBooking) => (
         <div key={booking.id} className="border p-4 flex justify-between">
           <div>
             <p>Status: {booking.status}</p>

@@ -47,6 +47,43 @@ const getAllTutors = async (page: number,
   };
 };
 
+const getFeaturedTutors = async (limit: number) => {
+  const tutors = await prisma.tutorProfile.findMany({
+    include: {
+      subjects: true,
+      user: {
+        include: {
+          tutorReviews: true,
+        },
+      },
+    },
+  });
+
+  return tutors
+    .map((tutor) => {
+      const reviews = tutor.user.tutorReviews;
+      const reviewCount = reviews.length;
+      const averageRating =
+        reviewCount > 0
+          ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+          : 0;
+
+      return {
+        ...tutor,
+        averageRating,
+        reviewCount,
+      };
+    })
+    .sort((a, b) => {
+      if (b.averageRating !== a.averageRating) {
+        return b.averageRating - a.averageRating;
+      }
+
+      return b.reviewCount - a.reviewCount;
+    })
+    .slice(0, limit);
+};
+
 
 const getTutorById = async (id: string) => {
   return prisma.tutorProfile.findUnique({
@@ -265,6 +302,7 @@ const markSlotDeleted = async (slotId: string) => {
 
 export const TutorService = {
   getAllTutors,
+  getFeaturedTutors,
   getTutorById,
   createTutorProfile,
   getAvailability,

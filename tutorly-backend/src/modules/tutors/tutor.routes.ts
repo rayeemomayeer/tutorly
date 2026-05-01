@@ -11,6 +11,8 @@ const tutorRouter = Router();
 
 tutorRouter.get("/", authMiddleware("tutor", "read"), TutorController.getAllTutors);
 
+tutorRouter.get("/featured", TutorController.getFeaturedTutors);
+
 tutorRouter.get("/:id", authMiddleware("tutor", "read"), TutorController.getTutorById);
 
 

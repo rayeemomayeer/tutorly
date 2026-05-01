@@ -19,6 +19,13 @@ const getAllTutors = async (req: Request, res: Response) => {
   res.json(result);
 };
 
+const getFeaturedTutors = async (req: Request, res: Response) => {
+  const limit = parseInt(req.query.limit as string) || 3;
+  const tutors = await TutorService.getFeaturedTutors(limit);
+
+  res.json({ data: tutors });
+};
+
 const getTutorById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const tutor = await TutorService.getTutorById(id as string);
@@ -115,6 +122,7 @@ const getTutorBookings = async (req: Request, res: Response) => {
 
 export const TutorController = {
   getAllTutors,
+  getFeaturedTutors,
   getTutorById,
   createTutorProfile,
   getAvailability,
