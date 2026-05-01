@@ -1,10 +1,16 @@
+import { Footer } from "@/components/layout/Footer";
+import { Navbar } from "@/components/layout/Navbar";
 import TutorList from "@/features/tutors/TutorList";
 
+export const metadata = {
+  title: "Browse Tutors — Tutorly",
+  description: "Find expert tutors across any subject and book a session instantly.",
+};
+
 export default function TutorsPage() {
-  return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Tutors</h1>
-      <TutorList />
-    </div>
-  );
-} 
+  return <>
+
+  <TutorList/>
+
+  </>;
+}

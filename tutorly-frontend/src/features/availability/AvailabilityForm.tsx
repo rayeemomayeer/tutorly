@@ -13,12 +13,9 @@ import {
   useDeleteAvailabilityMutation,
 } from "@/features/availability/availabilityApi";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// ─── Types ─────────────────────────────────────────────────────────────────────
 type Slot = {
   id?: string;
   dayOfWeek: number;
@@ -27,15 +24,395 @@ type Slot = {
   status?: string;
 };
 
+// ─── Constants ─────────────────────────────────────────────────────────────────
+const DAYS = [
+  { short: "Sun", label: "Sunday" },
+  { short: "Mon", label: "Monday" },
+  { short: "Tue", label: "Tuesday" },
+  { short: "Wed", label: "Wednesday" },
+  { short: "Thu", label: "Thursday" },
+  { short: "Fri", label: "Friday" },
+  { short: "Sat", label: "Saturday" },
+];
+
+// ─── Helpers ───────────────────────────────────────────────────────────────────
+/** Converts "HH:MM" to ISO string — same logic as before, untouched */
+function convertTimeToISO(time: string): string {
+  const today = new Date();
+  const [hours, minutes] = time.split(":");
+  today.setHours(Number(hours));
+  today.setMinutes(Number(minutes));
+  today.setSeconds(0);
+  today.setMilliseconds(0);
+  return today.toISOString();
+}
+
+/** Extracts "HH:MM" from an ISO date string for <input type="time"> */
+function formatTimeForInput(dateString: string): string {
+  return new Date(dateString).toISOString().slice(11, 16);
+}
+
+/** Renders "9:00 AM" style display */
+function formatDisplayTime(dateString: string): string {
+  return new Date(dateString).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+// ─── Skeleton ──────────────────────────────────────────────────────────────────
+function CalendarSkeleton() {
+  return (
+    <div className="flex gap-3">
+      {DAYS.map((d) => (
+        <div key={d.short} className="flex-1 flex flex-col gap-2">
+          <Skeleton className="h-8 w-full rounded-lg" />
+          <Skeleton className="h-20 w-full rounded-lg" />
+          {d.short === "Mon" && <Skeleton className="h-20 w-full rounded-lg" />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Individual Slot Card ──────────────────────────────────────────────────────
+function SlotCard({
+  slot,
+  isEditing,
+  onEdit,
+  onCancelEdit,
+  onSave,
+  onDelete,
+  onLocalChange,
+}: {
+  slot: Slot;
+  isEditing: boolean;
+  onEdit: () => void;
+  onCancelEdit: () => void;
+  onSave: (updated: Slot) => void;
+  onDelete: () => void;
+  onLocalChange: (updated: Slot) => void;
+}) {
+  const isBooked = slot.status === "BOOKED";
+
+  if (isEditing) {
+    return (
+      <div className="bg-white border border-indigo-300 rounded-lg p-2.5 flex flex-col gap-2 shadow-sm">
+        {/* Day selector in edit mode */}
+        <select
+          value={slot.dayOfWeek}
+          onChange={(e) =>
+            onLocalChange({ ...slot, dayOfWeek: Number(e.target.value) })
+          }
+          className="w-full text-[11px] text-[#1a1a18] bg-[#fafaf8] border border-[#e5e3de]
+                     rounded px-2 py-1.5 focus:outline-none focus:border-indigo-400"
+        >
+          {DAYS.map((d, i) => (
+            <option key={i} value={i}>
+              {d.label}
+            </option>
+          ))}
+        </select>
+
+        {/* Start time */}
+        <div className="flex flex-col gap-0.5">
+          <label className="text-[10px] text-[#9e9c97] font-medium uppercase tracking-wide">
+            Start
+          </label>
+          <input
+            type="time"
+            value={formatTimeForInput(slot.startTime)}
+            onChange={(e) =>
+              onLocalChange({ ...slot, startTime: e.target.value })
+            }
+            className="w-full text-xs text-[#1a1a18] bg-[#fafaf8] border border-[#e5e3de]
+                       rounded px-2 py-1.5 focus:outline-none focus:border-indigo-400"
+          />
+        </div>
+
+        {/* End time */}
+        <div className="flex flex-col gap-0.5">
+          <label className="text-[10px] text-[#9e9c97] font-medium uppercase tracking-wide">
+            End
+          </label>
+          <input
+            type="time"
+            value={formatTimeForInput(slot.endTime)}
+            onChange={(e) =>
+              onLocalChange({ ...slot, endTime: e.target.value })
+            }
+            className="w-full text-xs text-[#1a1a18] bg-[#fafaf8] border border-[#e5e3de]
+                       rounded px-2 py-1.5 focus:outline-none focus:border-indigo-400"
+          />
+        </div>
+
+        {/* Save / Cancel */}
+        <div className="flex gap-1.5 mt-0.5">
+          <button
+            onClick={() => onSave(slot)}
+            className="flex-1 flex items-center justify-center gap-1 text-[11px] font-medium
+                       bg-indigo-500 text-white rounded py-1.5 hover:bg-indigo-600 transition-colors"
+          >
+            <Save className="w-3 h-3" /> Save
+          </button>
+          <button
+            onClick={onCancelEdit}
+            className="flex items-center justify-center w-7 h-7 rounded border border-[#e5e3de]
+                       text-[#9e9c97] hover:text-[#1a1a18] hover:border-[#c4c2bd] transition-colors"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isBooked) {
+    return (
+      <div className="bg-rose-50 border border-rose-200 rounded-lg p-2.5">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] font-medium tracking-wider uppercase text-rose-400">
+            Booked
+          </span>
+        </div>
+        <p className="text-[11px] text-rose-400 font-light">
+          {formatDisplayTime(slot.startTime)}
+        </p>
+        <p className="text-[11px] text-rose-400 font-light">
+          {formatDisplayTime(slot.endTime)}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="group bg-white border border-[#e5e3de] rounded-lg p-2.5
+                 hover:border-indigo-300 hover:shadow-sm transition-all duration-150"
+    >
+      {/* Time display */}
+      <p className="text-[12px] font-medium text-[#1a1a18] leading-tight">
+        {formatDisplayTime(slot.startTime)}
+      </p>
+      <p className="text-[11px] text-[#9e9c97] font-light mb-2">
+        {formatDisplayTime(slot.endTime)}
+      </p>
+
+      {/* Open badge */}
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-medium tracking-wider uppercase text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-[3px]">
+          Open
+        </span>
+
+        {/* Actions — visible on hover */}
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={onEdit}
+            className="w-6 h-6 flex items-center justify-center rounded text-[#9e9c97]
+                       hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+          >
+            <Pencil className="w-3 h-3" />
+          </button>
+          <button
+            onClick={onDelete}
+            className="w-6 h-6 flex items-center justify-center rounded text-[#9e9c97]
+                       hover:text-rose-600 hover:bg-rose-50 transition-colors"
+          >
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Add Slot Panel ────────────────────────────────────────────────────────────
+function AddSlotPanel({
+  newSlot,
+  setNewSlot,
+  onAdd,
+}: {
+  newSlot: { dayOfWeek: number; startTime: string; endTime: string };
+  setNewSlot: (s: typeof newSlot) => void;
+  onAdd: () => void;
+}) {
+  return (
+    <div className="bg-white border border-[#e5e3de] rounded-xl p-5">
+      <div className="flex items-center gap-2 mb-5">
+        <div className="w-5 h-px bg-indigo-500" />
+        <span className="text-[11px] font-medium tracking-[0.1em] uppercase text-indigo-500">
+          Add availability slot
+        </span>
+      </div>
+
+      <div className="flex items-end gap-4 flex-wrap">
+        {/* Day selector — pill buttons, maps to dayOfWeek 0–6 (same payload) */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-[#6b6b66]">Day</label>
+          <div className="flex gap-1.5">
+            {DAYS.map((d, i) => (
+              <button
+                key={i}
+                onClick={() => setNewSlot({ ...newSlot, dayOfWeek: i })}
+                className={`w-9 h-9 rounded-lg text-xs font-medium transition-all duration-100
+                  ${newSlot.dayOfWeek === i
+                    ? "bg-[#1a1a18] text-[#fafaf8]"
+                    : "bg-[#f0ede8] text-[#6b6b66] hover:bg-[#e8e5df]"
+                  }`}
+              >
+                {d.short}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Start time */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-[#6b6b66]">
+            Start time
+          </label>
+          <input
+            type="time"
+            value={newSlot.startTime}
+            onChange={(e) =>
+              setNewSlot({ ...newSlot, startTime: e.target.value })
+            }
+            className="text-sm text-[#1a1a18] bg-[#fafaf8] border border-[#e5e3de]
+                       rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400
+                       focus:ring-1 focus:ring-indigo-100 transition-colors"
+          />
+        </div>
+
+        {/* End time */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-[#6b6b66]">
+            End time
+          </label>
+          <input
+            type="time"
+            value={newSlot.endTime}
+            onChange={(e) =>
+              setNewSlot({ ...newSlot, endTime: e.target.value })
+            }
+            className="text-sm text-[#1a1a18] bg-[#fafaf8] border border-[#e5e3de]
+                       rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400
+                       focus:ring-1 focus:ring-indigo-100 transition-colors"
+          />
+        </div>
+
+        {/* Submit */}
+        <button
+          onClick={onAdd}
+          className="flex items-center gap-2 bg-[#1a1a18] text-[#fafaf8] text-sm
+                     px-5 py-2 rounded-md hover:bg-[#2c2c2a] transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add slot
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Weekly Calendar Grid ──────────────────────────────────────────────────────
+function WeekGrid({
+  slots,
+  editingSlotId,
+  onEdit,
+  onCancelEdit,
+  onSave,
+  onDelete,
+  onLocalChange,
+}: {
+  slots: Slot[];
+  editingSlotId: string | null;
+  onEdit: (id: string) => void;
+  onCancelEdit: () => void;
+  onSave: (slotId: string, updated: Slot) => void;
+  onDelete: (slotId: string) => void;
+  onLocalChange: (updated: Slot) => void;
+}) {
+  const totalSlots = slots.length;
+
+  return (
+    <div className="bg-white border border-[#e5e3de] rounded-xl overflow-hidden">
+      {/* Legend row */}
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#e5e3de]">
+        <span className="font-display text-base font-normal text-[#1a1a18] tracking-tight">
+          Weekly schedule
+        </span>
+        <span className="text-xs text-[#9e9c97] font-light">
+          {totalSlots} slot{totalSlots !== 1 ? "s" : ""} total
+        </span>
+      </div>
+
+      {/* Grid */}
+      <div className="grid grid-cols-7 divide-x divide-[#f0ede8]">
+        {DAYS.map((day, dayIndex) => {
+          const daySlots = slots.filter((s) => s.dayOfWeek === dayIndex);
+
+          return (
+            <div key={dayIndex} className="flex flex-col min-h-[320px]">
+              {/* Day header */}
+              <div
+                className={`px-2.5 py-2.5 border-b border-[#f0ede8] text-center
+                  ${daySlots.length > 0 ? "bg-[#fafaf8]" : "bg-white"}`}
+              >
+                <p className="text-[11px] font-medium text-[#1a1a18] tracking-wide">
+                  {day.short}
+                </p>
+                {daySlots.length > 0 && (
+                  <p className="text-[10px] text-indigo-500 mt-0.5">
+                    {daySlots.length}
+                  </p>
+                )}
+              </div>
+
+              {/* Slots column */}
+              <div className="flex flex-col gap-2 p-2 flex-1">
+                {daySlots.length === 0 ? (
+                  <div className="flex-1 flex items-center justify-center">
+                    <span className="text-[10px] text-[#e5e3de] select-none">
+                      —
+                    </span>
+                  </div>
+                ) : (
+                  daySlots.map((slot, idx) => (
+                    <SlotCard
+                      key={slot.id ?? `${dayIndex}-${idx}`}
+                      slot={slot}
+                      isEditing={editingSlotId === slot.id}
+                      onEdit={() => onEdit(slot.id!)}
+                      onCancelEdit={onCancelEdit}
+                      onSave={(updated) => onSave(slot.id!, updated)}
+                      onDelete={() => onDelete(slot.id!)}
+                      onLocalChange={onLocalChange}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ────────────────────────────────────────────────────────────
 export default function AvailabilityForm() {
   const { id } = useParams();
 
-  const { data: availability, isLoading, isFetching, error: fetchError } =
-    useGetAvailabilityQuery(id as string, {
-      refetchOnMountOrArgChange: true,
-      refetchOnReconnect: true,
-      refetchOnFocus: true,
-    });
+  const {
+    data: availability,
+    isLoading,
+    isFetching,
+    error: fetchError,
+  } = useGetAvailabilityQuery(id as string, {
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+    refetchOnFocus: true,
+  });
 
   const [setAvailability] = useSetAvailabilityMutation();
   const [updateAvailability] = useUpdateAvailabilityMutation();
@@ -43,51 +420,23 @@ export default function AvailabilityForm() {
 
   const [localAvailability, setLocalAvailability] = useState<Slot[]>([]);
   const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
-
   const [newSlot, setNewSlot] = useState({
     dayOfWeek: 0,
     startTime: "",
     endTime: "",
   });
 
-  const convertTimeToISO = (time: string) => {
-    const today = new Date();
-    const [hours, minutes] = time.split(":");
-
-    today.setHours(Number(hours));
-    today.setMinutes(Number(minutes));
-    today.setSeconds(0);
-    today.setMilliseconds(0);
-
-    return today.toISOString();
-  };
-
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  const formatTimeForInput = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toISOString().slice(11, 16);
-  };
-
-  const formatDisplayTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
+  // ── Sync from API ──
   useEffect(() => {
-    if (availability) {
-      setLocalAvailability(availability);
-    }
+    if (availability) setLocalAvailability(availability);
   }, [availability]);
 
+  // ── Fetch error toast ──
   useEffect(() => {
-    if (fetchError) {
-      toast.error("Failed to load availability.");
-    }
+    if (fetchError) toast.error("Failed to load availability.");
   }, [fetchError]);
 
+  // ── SSE — logic completely unchanged ──
   useEffect(() => {
     if (!id) return;
 
@@ -106,19 +455,18 @@ export default function AvailabilityForm() {
           )
         );
       }
-
       if (data.type === "OPEN") {
         setLocalAvailability((prev) =>
-          prev.map((s) => (s.id === data.slotId ? { ...s, status: "OPEN" } : s))
+          prev.map((s) =>
+            s.id === data.slotId ? { ...s, status: "OPEN" } : s
+          )
         );
       }
-
       if (data.type === "DELETED") {
         setLocalAvailability((prev) =>
           prev.filter((s) => s.id !== data.slotId)
         );
       }
-
       if (data.type === "UPDATED") {
         setLocalAvailability((prev) =>
           prev.map((s) =>
@@ -133,11 +481,10 @@ export default function AvailabilityForm() {
       eventSource.close();
     };
 
-    return () => {
-      eventSource.close();
-    };
+    return () => eventSource.close();
   }, [id]);
 
+  // ── Handlers — logic completely unchanged ──
   const handleAddSlot = async () => {
     if (!newSlot.startTime || !newSlot.endTime) {
       toast.error("Please fill all fields.");
@@ -145,7 +492,6 @@ export default function AvailabilityForm() {
     }
 
     const loadingToast = toast.loading("Adding slot...");
-
     try {
       const payload = {
         ...newSlot,
@@ -163,12 +509,7 @@ export default function AvailabilityForm() {
         ...(Array.isArray(created) ? created : [created]),
       ]);
 
-      setNewSlot({
-        dayOfWeek: 0,
-        startTime: "",
-        endTime: "",
-      });
-
+      setNewSlot({ dayOfWeek: 0, startTime: "", endTime: "" });
       toast.success("Slot added.", { id: loadingToast });
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to add slot.", {
@@ -224,192 +565,80 @@ export default function AvailabilityForm() {
     }
   };
 
+  // ── Loading state ──
   if (isLoading || isFetching) {
     return (
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-24 w-full rounded-xl" />
-        ))}
+      <div className="min-h-screen bg-[#fafaf8] px-10 py-10 flex flex-col gap-6">
+        <div className="flex flex-col gap-1">
+          <Skeleton className="h-4 w-40 rounded" />
+          <Skeleton className="h-9 w-64 rounded" />
+        </div>
+        <Skeleton className="h-24 w-full rounded-xl" />
+        <CalendarSkeleton />
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Manage Availability</h2>
-
-      {/* Add Slot */}
-      <Card>
-        <CardContent className="p-4 flex flex-wrap gap-2 items-center">
-          <Input
-            type="number"
-            min={0}
-            max={6}
-            className="w-20"
-            value={newSlot.dayOfWeek}
-            onChange={(e) =>
-              setNewSlot({
-                ...newSlot,
-                dayOfWeek: Number(e.target.value),
-              })
-            }
-          />
-
-          <Input
-            type="time"
-            value={newSlot.startTime}
-            onChange={(e) =>
-              setNewSlot({
-                ...newSlot,
-                startTime: e.target.value,
-              })
-            }
-          />
-
-          <Input
-            type="time"
-            value={newSlot.endTime}
-            onChange={(e) =>
-              setNewSlot({
-                ...newSlot,
-                endTime: e.target.value,
-              })
-            }
-          />
-
-          <Button onClick={handleAddSlot}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Slot
-          </Button>
-        </CardContent>
-      </Card>
-
-      {localAvailability?.length === 0 ? (
-        <Card>
-          <CardContent className="p-6 text-center text-muted-foreground">
-            No availability slots found.
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4">
-          {localAvailability.map((slot, index) => (
-            <Card
-              key={slot.id ?? `${slot.dayOfWeek}-${slot.startTime}-${index}`}
-              className={`transition-all ${slot.status === "BOOKED"
-                ? "opacity-70 border-red-300 bg-red-50"
-                : "hover:shadow-md"
-                }`}
-            >
-              <CardContent className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                {editingSlotId === slot.id ? (
-                  <div className="flex flex-wrap gap-2 items-center w-full">
-                    <Input
-                      type="number"
-                      min={0}
-                      max={6}
-                      className="w-20"
-                      value={slot.dayOfWeek}
-                      onChange={(e) =>
-                        setLocalAvailability((prev) =>
-                          prev.map((s) =>
-                            s.id === slot.id
-                              ? { ...s, dayOfWeek: Number(e.target.value) }
-                              : s
-                          )
-                        )
-                      }
-                    />
-
-                    <Input
-                      type="time"
-                      value={formatTimeForInput(slot.startTime)}
-                      onChange={(e) =>
-                        setLocalAvailability((prev) =>
-                          prev.map((s) =>
-                            s.id === slot.id
-                              ? { ...s, startTime: e.target.value }
-                              : s
-                          )
-                        )
-                      }
-                    />
-
-                    <Input
-                      type="time"
-                      value={formatTimeForInput(slot.endTime)}
-                      onChange={(e) =>
-                        setLocalAvailability((prev) =>
-                          prev.map((s) =>
-                            s.id === slot.id
-                              ? { ...s, endTime: e.target.value }
-                              : s
-                          )
-                        )
-                      }
-                    />
-
-                    <Button
-                      size="icon"
-                      onClick={() => {
-                        const updatedSlot = localAvailability.find(
-                          (s) => s.id === slot.id
-                        )!;
-                        handleUpdate(slot.id!, updatedSlot);
-                        setEditingSlotId(null);
-                      }}
-                    >
-                      <Save className="h-4 w-4" />
-                    </Button>
-
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => setEditingSlotId(null)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="space-y-1">
-                      <p className="font-medium">
-                        {days[slot.dayOfWeek] ?? `Day ${slot.dayOfWeek}`}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatDisplayTime(slot.startTime)} -{" "}
-                        {formatDisplayTime(slot.endTime)}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {slot.status === "BOOKED" ? (
-                        <Badge variant="destructive">BOOKED</Badge>
-                      ) : (
-                        <>
-                          <Button
-                            size="icon"
-                            variant="secondary"
-                            onClick={() => setEditingSlotId(slot.id!)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-
-                          <Button
-                            size="icon"
-                            variant="destructive"
-                            onClick={() => handleDelete(slot.id!)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+    <div className="min-h-screen bg-[#fafaf8] px-10 py-10 flex flex-col gap-6">
+      {/* ── Page header ── */}
+      <div>
+        <div className="flex items-center gap-2.5 mb-3">
+          <span className="w-5 h-px bg-indigo-500 block" />
+          <span className="text-[11px] font-medium tracking-[0.12em] uppercase text-indigo-500">
+            Tutor dashboard
+          </span>
         </div>
+        <h1 className="font-display text-[34px] font-normal tracking-[-0.8px] text-[#1a1a18] leading-tight">
+          Manage{" "}
+          <em className="font-display italic font-light text-indigo-500">
+            availability
+          </em>
+        </h1>
+        <p className="text-sm text-[#9e9c97] font-light mt-1.5">
+          Set your weekly recurring slots. Students can book any open slot
+          instantly.
+        </p>
+      </div>
+
+      {/* ── Add Slot Panel ── */}
+      <AddSlotPanel
+        newSlot={newSlot}
+        setNewSlot={setNewSlot}
+        onAdd={handleAddSlot}
+      />
+
+      {/* ── Empty state ── */}
+      {localAvailability.length === 0 ? (
+        <div className="bg-white border border-[#e5e3de] rounded-xl flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#f0ede8] flex items-center justify-center mb-4 text-xl">
+            📅
+          </div>
+          <p className="text-sm font-medium text-[#1a1a18] mb-1">
+            No slots yet
+          </p>
+          <p className="text-xs text-[#9e9c97] font-light">
+            Use the form above to add your first availability slot.
+          </p>
+        </div>
+      ) : (
+        /* ── Week Calendar Grid ── */
+        <WeekGrid
+          slots={localAvailability}
+          editingSlotId={editingSlotId}
+          onEdit={(id) => setEditingSlotId(id)}
+          onCancelEdit={() => setEditingSlotId(null)}
+          onSave={(slotId, updated) => {
+            handleUpdate(slotId, updated);
+            setEditingSlotId(null);
+          }}
+          onDelete={handleDelete}
+          onLocalChange={(updated) =>
+            setLocalAvailability((prev) =>
+              prev.map((s) => (s.id === updated.id ? updated : s))
+            )
+          }
+        />
       )}
     </div>
   );

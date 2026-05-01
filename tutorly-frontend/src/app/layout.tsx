@@ -4,6 +4,8 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import SessionProvider from "@/features/auth/SessionProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 
 
 const fraunces = Fraunces({
@@ -36,7 +38,9 @@ export default function RootLayout({
         
         <Providers>
           <SessionProvider>
+            <Navbar />
             {children}
+            <Footer />
             <Toaster />
           </SessionProvider>
 

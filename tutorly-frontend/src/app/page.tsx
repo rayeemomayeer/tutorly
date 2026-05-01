@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 export default function Home() {
    return (
     <div className="min-h-screen bg-[#fafaf8]">
-      <Navbar />
+
       <main className="space-y-16">
         <Hero />
         <StatsBar />
@@ -19,7 +19,7 @@ export default function Home() {
         <HowItWorks />
         <CtaStrip />
       </main>
-      <Footer />
+
     </div>
   );
 }
