@@ -8,7 +8,7 @@ const STATS = [
 export function StatsBar() {
   return (
 
-    <div className="flex items-center gap-12 px-10 py-8 border-t border-b border-[#e5e3de] bg-[#fafaf8]">
+    <div className="flex justify-center items-center gap-12 px-10 py-8 border-t border-b border-[#e5e3de] bg-[#fafaf8]">
       {STATS.map((stat) => (
         <div key={stat.label} className="flex flex-col gap-0.5">
           <span className="font-display text-[30px] font-normal text-[#1a1a18] tracking-[-0.5px] leading-none">
