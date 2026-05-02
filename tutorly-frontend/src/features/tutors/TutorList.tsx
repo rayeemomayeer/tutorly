@@ -151,10 +151,7 @@ function TutorCard({
                          text-[#1a1a18] bg-[#f0ede8] hover:bg-[#e8e5df] py-2 rounded-md transition-colors">
               View
             </Link>
-            <button className="flex-1 flex items-center justify-center text-xs font-medium
-                               text-rose-600 bg-rose-50 hover:bg-rose-100 py-2 rounded-md transition-colors">
-              Ban
-            </button>
+            
           </div>
         )}
         {!role && (
