@@ -7,16 +7,13 @@ const STATS = [
 
 export function StatsBar() {
   return (
-
-    <div className="flex justify-center items-center gap-12 px-10 py-8 border-t border-b border-[#e5e3de] bg-[#fafaf8]">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[#e5e3de] border-t border-b border-[#e5e3de]">
       {STATS.map((stat) => (
-        <div key={stat.label} className="flex flex-col gap-0.5">
-          <span className="font-display text-[30px] font-normal text-[#1a1a18] tracking-[-0.5px] leading-none">
+        <div key={stat.label} className="flex flex-col gap-0.5 bg-[#fafaf8] px-6 sm:px-8 py-6 sm:py-8">
+          <span className="font-display text-[26px] sm:text-[30px] font-normal text-[#1a1a18] tracking-[-0.5px] leading-none">
             {stat.value}
           </span>
-          <span className="text-xs text-[#9e9c97] font-light mt-1">
-            {stat.label}
-          </span>
+          <span className="text-xs text-[#9e9c97] font-light mt-1">{stat.label}</span>
         </div>
       ))}
     </div>
