@@ -4,7 +4,7 @@ import AvailabilityForm from "@/features/availability/AvailabilityForm";
 
 export default function TutorAvailabilityPage() {
   return (
-    <div className="p-6">
+    <div className="px-4 sm:px-6 lg:px-10 py-6">
       <AvailabilityForm />
     </div>
   );

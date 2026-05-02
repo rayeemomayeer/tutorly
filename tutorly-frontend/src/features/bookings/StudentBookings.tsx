@@ -5,7 +5,6 @@ import CancelBookingButton from "./CancelBookingButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
 type Booking = {
   id: string;
   status: "CONFIRMED" | "COMPLETED" | "CANCELLED" | string;
@@ -13,7 +12,6 @@ type Booking = {
   tutor?: { name?: string; image?: string };
 };
 
-// ─── Status config ─────────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<
   string,
   { label: string; accent: string; dot: string; badge: string }
@@ -40,7 +38,6 @@ const STATUS_CONFIG: Record<
 
 const STATUS_ORDER = ["CONFIRMED", "COMPLETED", "CANCELLED"];
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString([], {
     weekday: "short",
@@ -66,7 +63,6 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-// ─── Skeleton ──────────────────────────────────────────────────────────────────
 function BookingSkeleton() {
   return (
     <div className="bg-white border border-[#e5e3de] border-l-4 border-l-[#e5e3de] rounded-xl px-5 py-4 flex items-center gap-5">
@@ -80,7 +76,6 @@ function BookingSkeleton() {
   );
 }
 
-// ─── Individual booking card ───────────────────────────────────────────────────
 function BookingCard({ booking }: { booking: Booking }) {
   const config = STATUS_CONFIG[booking.status] ?? {
     label: booking.status,
@@ -98,7 +93,6 @@ function BookingCard({ booking }: { booking: Booking }) {
                   hover:shadow-sm transition-all duration-150
                   ${isCancelled ? "opacity-60" : ""}`}
     >
-      {/* Tutor avatar */}
       <div className="shrink-0">
         {booking.tutor?.image ? (
           <img
@@ -114,7 +108,6 @@ function BookingCard({ booking }: { booking: Booking }) {
         )}
       </div>
 
-      {/* Main info */}
       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
         <p className="text-sm font-medium text-[#1a1a18] truncate">
           {booking.tutor?.name ?? "Unknown tutor"}
@@ -130,7 +123,6 @@ function BookingCard({ booking }: { booking: Booking }) {
         </div>
       </div>
 
-      {/* Status badge */}
       <div className="shrink-0">
         <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium
                           px-2.5 py-1 rounded-full ${config.badge}`}>
@@ -139,7 +131,6 @@ function BookingCard({ booking }: { booking: Booking }) {
         </span>
       </div>
 
-      {/* Actions */}
       <div className="shrink-0 flex gap-2">
         {booking.status === "CONFIRMED" && (
           <CancelBookingButton id={booking.id} />
@@ -149,7 +140,6 @@ function BookingCard({ booking }: { booking: Booking }) {
   );
 }
 
-// ─── Section group ─────────────────────────────────────────────────────────────
 function BookingGroup({
   status,
   bookings,
@@ -182,7 +172,7 @@ function BookingGroup({
         <div className="flex-1 h-px bg-[#e5e3de]" />
       </div>
 
-      {/* Cards */}
+
       <div className="flex flex-col gap-2.5">
         {bookings.map((b) => (
           <BookingCard key={b.id} booking={b} />
@@ -192,12 +182,11 @@ function BookingGroup({
   );
 }
 
-// ─── Main component ────────────────────────────────────────────────────────────
 export default function StudentBookings() {
   // Logic completely unchanged
   const { data, isLoading } = useGetBookingsQuery();
 
-  // ── Loading ──
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#fafaf8] px-10 py-10 flex flex-col gap-6">
@@ -212,7 +201,7 @@ export default function StudentBookings() {
     );
   }
 
-  // ── Empty ──
+
   if (!data || data.length === 0) {
     return (
       <div className="min-h-screen bg-[#fafaf8] px-10 py-10">
@@ -232,7 +221,7 @@ export default function StudentBookings() {
           </h1>
         </div>
 
-        {/* Empty state */}
+
         <div className="bg-white border border-[#e5e3de] rounded-xl flex flex-col
                         items-center justify-center py-20 text-center max-w-md">
           <div className="w-12 h-12 rounded-full bg-[#f0ede8] flex items-center
@@ -257,7 +246,7 @@ export default function StudentBookings() {
     );
   }
 
-  // ── Group bookings by status in defined order ──
+
   const grouped = STATUS_ORDER.reduce<Record<string, Booking[]>>(
     (acc, status) => {
       acc[status] = data.filter((b: Booking) => b.status === status);
@@ -266,13 +255,13 @@ export default function StudentBookings() {
     {}
   );
 
-  // Count active (confirmed) bookings for the header
+
   const confirmedCount = grouped["CONFIRMED"]?.length ?? 0;
 
   return (
     <div className="min-h-screen bg-[#fafaf8] px-10 py-10 flex flex-col gap-8 max-w-4xl">
 
-      {/* ── Page header ── */}
+
       <div>
         <div className="flex items-center gap-2.5 mb-3">
           <span className="w-5 h-px bg-indigo-500 block" />
@@ -294,7 +283,6 @@ export default function StudentBookings() {
         </p>
       </div>
 
-      {/* ── Grouped booking lists ── */}
       <div className="flex flex-col gap-8">
         {STATUS_ORDER.map((status) => (
           <BookingGroup
