@@ -193,7 +193,7 @@ export default function TutorBookings() {
 
   const grouped = STATUS_ORDER.reduce<Record<string, Booking[]>>((acc, status) => {
     acc[status] = data.filter((b: Booking) => b.status === status);
-    return acc;
+    return acc; 
   }, {});
 
   const confirmedCount = grouped["CONFIRMED"]?.length ?? 0;
