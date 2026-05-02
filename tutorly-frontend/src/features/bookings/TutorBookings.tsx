@@ -57,14 +57,14 @@ function getInitials(name: string) {
 
 function BookingSkeleton() {
   return (
-    <div className="bg-white border border-[#e5e3de] border-l-4 border-l-[#e5e3de] rounded-xl px-4 sm:px-5 py-4 flex items-center gap-4">
-      <Skeleton className="w-10 h-10 rounded-full shrink-0" />
-      <div className="flex flex-col gap-1.5 flex-1">
-        <Skeleton className="h-3.5 w-32" />
+    <div className="bg-white border border-[#e5e3de] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+      <Skeleton className="w-10 h-10 rounded-full" />
+      <div className="flex flex-col gap-2 flex-1">
+        <Skeleton className="h-4 w-32" />
         <Skeleton className="h-3 w-24" />
       </div>
-      <Skeleton className="h-6 w-20 rounded-full hidden sm:block" />
-      <Skeleton className="h-8 w-24 rounded-md hidden md:block" />
+      <Skeleton className="h-6 w-20 rounded-full" />
+      <Skeleton className="h-8 w-24 rounded-md" />
     </div>
   );
 }
@@ -76,26 +76,25 @@ function BookingCard({ booking }: { booking: Booking }) {
     dot: "bg-stone-300",
     badge: "text-stone-500 bg-stone-50",
   };
+
   const isCancelled = booking.status === "CANCELLED";
 
   return (
     <div
-      className={`group bg-white border border-[#e5e3de] border-l-4 ${config.accent}
-                  rounded-xl px-4 sm:px-5 py-4
-                  flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5
-                  hover:shadow-sm transition-all duration-150
-                  ${isCancelled ? "opacity-60" : ""}`}
+      className={`bg-white border border-[#e5e3de] border-l-4 ${config.accent}
+      rounded-xl p-4 flex flex-col gap-3 sm:gap-4
+      ${isCancelled ? "opacity-60" : ""}`}
     >
-      <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="flex items-center gap-3">
         {booking.student?.image ? (
           <img
             src={booking.student.image}
             alt={booking.student.name}
-            className="w-10 h-10 rounded-full object-cover border border-[#e5e3de] shrink-0"
+            className="w-10 h-10 rounded-full object-cover border border-[#e5e3de]"
           />
         ) : (
           <div className="w-10 h-10 rounded-full bg-stone-100 border border-[#e5e3de]
-                          flex items-center justify-center text-xs font-medium text-stone-500 shrink-0">
+          flex items-center justify-center text-xs font-medium text-stone-500">
             {booking.student?.name ? getInitials(booking.student.name) : "?"}
           </div>
         )}
@@ -104,22 +103,20 @@ function BookingCard({ booking }: { booking: Booking }) {
           <p className="text-sm font-medium text-[#1a1a18] truncate">
             {booking.student?.name ?? "Unknown student"}
           </p>
-          <div className="flex items-center gap-2 flex-wrap mt-0.5">
-            <span className="text-xs text-[#6b6b66] font-light">{formatDate(booking.scheduledAt)}</span>
-            <span className="text-[#e5e3de] text-xs hidden sm:inline">·</span>
-            <span className="text-xs text-[#6b6b66] font-light">{formatTime(booking.scheduledAt)}</span>
-          </div>
+          <p className="text-xs text-[#6b6b66]">
+            {formatDate(booking.scheduledAt)} · {formatTime(booking.scheduledAt)}
+          </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
         <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full ${config.badge}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
           {config.label}
         </span>
 
         {booking.status === "CONFIRMED" && (
-          <div className="flex gap-2">
+          <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
             <CancelBookingButton id={booking.id} />
             <CompleteBookingButton id={booking.id} />
           </div>
@@ -139,15 +136,16 @@ function BookingGroup({ status, bookings }: { status: string; bookings: Booking[
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <span className={`w-2 h-2 rounded-full ${config.dot}`} />
-          <span className="text-[11px] font-medium tracking-[0.1em] uppercase text-[#9e9c97]">
-            {config.label}
-          </span>
-          <span className="text-[11px] text-[#c4c2bd]">{bookings.length}</span>
+          <span className="text-xs uppercase text-[#9e9c97]">{config.label}</span>
+          <span className="text-xs text-[#c4c2bd]">{bookings.length}</span>
         </div>
         <div className="flex-1 h-px bg-[#e5e3de]" />
       </div>
-      <div className="flex flex-col gap-2.5">
-        {bookings.map((b) => <BookingCard key={b.id} booking={b} />)}
+
+      <div className="flex flex-col gap-3">
+        {bookings.map((b) => (
+          <BookingCard key={b.id} booking={b} />
+        ))}
       </div>
     </div>
   );
@@ -160,46 +158,33 @@ export default function TutorBookings() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#fafaf8] px-4 sm:px-10 py-10 flex flex-col gap-6 max-w-4xl mx-auto">
-        <div className="flex flex-col gap-1.5">
-          <Skeleton className="h-3.5 w-32 rounded" />
-          <Skeleton className="h-9 w-56 rounded" />
+      <div className="min-h-screen bg-[#fafaf8] px-4 sm:px-6 lg:px-10 py-8 flex flex-col gap-6 max-w-4xl mx-auto">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-8 w-52" />
         </div>
-        <div className="flex flex-col gap-2.5">
-          {[1, 2, 3].map((i) => <BookingSkeleton key={i} />)}
-        </div>
+        {[1, 2, 3].map((i) => (
+          <BookingSkeleton key={i} />
+        ))}
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="min-h-screen bg-[#fafaf8] px-4 sm:px-10 py-10 max-w-4xl mx-auto">
-        <div className="mb-10">
-          <div className="flex items-center gap-2.5 mb-3">
-            <span className="w-5 h-px bg-indigo-500 block" />
-            <span className="text-[11px] font-medium tracking-[0.12em] uppercase text-indigo-500">
-              Tutor dashboard
-            </span>
-          </div>
-          <h1 className="font-display text-[28px] sm:text-[34px] font-normal tracking-[-0.8px] text-[#1a1a18] leading-tight">
-            My{" "}
-            <em className="font-display italic font-light text-indigo-500">bookings</em>
-          </h1>
+      <div className="min-h-screen bg-[#fafaf8] px-4 sm:px-6 lg:px-10 py-10 max-w-4xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl">My bookings</h1>
         </div>
-        <div className="bg-white border border-[#e5e3de] rounded-xl flex flex-col items-center justify-center py-20 text-center max-w-md">
-          <div className="w-12 h-12 rounded-full bg-[#f0ede8] flex items-center justify-center mb-4 text-xl">
-            📅
-          </div>
-          <p className="text-sm font-medium text-[#1a1a18] mb-1">No bookings yet</p>
-          <p className="text-xs text-[#9e9c97] font-light leading-relaxed mb-5">
-            Students haven't booked any sessions with you yet.
-          </p>
+
+        <div className="bg-white border border-[#e5e3de] rounded-xl flex flex-col items-center justify-center py-16 text-center max-w-md mx-auto">
+          <div className="text-xl mb-3">📅</div>
+          <p className="text-sm mb-2">No bookings yet</p>
           <Link
             href={`/tutors/${id}/availability`}
-            className="text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-md transition-colors"
+            className="text-sm text-indigo-600 bg-indigo-50 px-4 py-2 rounded-md"
           >
-            Manage availability →
+            Manage availability
           </Link>
         </div>
       </div>
@@ -214,23 +199,12 @@ export default function TutorBookings() {
   const confirmedCount = grouped["CONFIRMED"]?.length ?? 0;
 
   return (
-    <div className="min-h-screen bg-[#fafaf8] px-4 sm:px-10 py-10 flex flex-col gap-8 max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[#fafaf8] px-4 sm:px-6 lg:px-10 py-8 flex flex-col gap-8 max-w-4xl mx-auto">
+
       <div>
-        <div className="flex items-center gap-2.5 mb-3">
-          <span className="w-5 h-px bg-indigo-500 block" />
-          <span className="text-[11px] font-medium tracking-[0.12em] uppercase text-indigo-500">
-            Tutor dashboard
-          </span>
-        </div>
-        <h1 className="font-display text-[28px] sm:text-[34px] font-normal tracking-[-0.8px] text-[#1a1a18] leading-tight">
-          My{" "}
-          <em className="font-display italic font-light text-indigo-500">bookings</em>
-        </h1>
-        <p className="text-sm text-[#9e9c97] font-light mt-1.5">
-          {confirmedCount > 0
-            ? `${confirmedCount} upcoming session${confirmedCount !== 1 ? "s" : ""}`
-            : "No upcoming sessions"}
-          {" "}· {data.length} total
+        <h1 className="text-2xl sm:text-3xl">My bookings</h1>
+        <p className="text-sm text-[#9e9c97] mt-1">
+          {confirmedCount > 0 ? `${confirmedCount} upcoming` : "No upcoming"} · {data.length} total
         </p>
       </div>
 
@@ -239,6 +213,7 @@ export default function TutorBookings() {
           <BookingGroup key={status} status={status} bookings={grouped[status] ?? []} />
         ))}
       </div>
+
     </div>
   );
 }
